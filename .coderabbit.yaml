@@ -1,0 +1,18 @@
+language: en-US
+reviews:
+  auto_review:
+    enabled: true
+    base_branches:
+      - main
+  path_instructions:
+    - path: "contracts/**/*.sol"
+      instructions: |
+        Review for Solidity security best practices, gas optimization,
+        and ERC-4337 compliance. Check for reentrancy, overflow, and
+        access control issues.
+    - path: "src/**/*.ts"
+      instructions: |
+        Review for TypeScript best practices, type safety, and security.
+        Pay attention to wallet operations and signature handling.
+chat:
+  auto_reply: true
