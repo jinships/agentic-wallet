@@ -1,0 +1,29 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc = "0.8.24"
+optimizer = true
+optimizer_runs = 10000
+via_ir = false
+evm_version = "cancun"
+
+# Remappings
+remappings = [
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+    "@account-abstraction/=lib/account-abstraction/contracts/",
+    "webauthn-sol/=lib/webauthn-sol/src/",
+    "solady/=lib/solady/src/",
+    "forge-std/=lib/forge-std/src/",
+    "FreshCryptoLib/=lib/webauthn-sol/lib/FreshCryptoLib/solidity/src/",
+]
+
+[rpc_endpoints]
+base = "${BASE_RPC_URL}"
+base_sepolia = "${BASE_SEPOLIA_RPC_URL}"
+
+[etherscan]
+base = { key = "${BASESCAN_API_KEY}", url = "https://api.basescan.org/api" }
+base_sepolia = { key = "${BASESCAN_API_KEY}", url = "https://api-sepolia.basescan.org/api" }
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
