@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AgentVault - Approve Transaction</title>
+  <style>
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #1a1a1a;
+      --bg-card: #252525;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0a0;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #22c55e;
+      --error: #ef4444;
+      --border: #333333;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      border-radius: 12px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+
+    .detail-value {
+      font-size: 15px;
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .detail-value.highlight {
+      color: var(--success);
+    }
+
+    .amount-display {
+      text-align: center;
+      padding: 24px 0;
+    }
+
+    .amount-value {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .amount-label {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .protocol-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 16px 0;
+    }
+
+    .protocol-box {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 16px 20px;
+      text-align: center;
+      min-width: 100px;
+    }
+
+    .protocol-name {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .protocol-apy {
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    .arrow {
+      color: var(--accent);
+      font-size: 20px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 18px 24px;
+      border-radius: 14px;
+      font-size: 17px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      margin-top: 12px;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-secondary);
+    }
+
+    .face-id-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .status {
+      text-align: center;
+      padding: 32px;
+    }
+
+    .status-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 32px;
+    }
+
+    .status-icon.success {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+    }
+
+    .status-icon.error {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--error);
+    }
+
+    .status-icon.loading {
+      background: rgba(59, 130, 246, 0.15);
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .status h2 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .status p {
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+
+    .expiry {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-top: 16px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      color: var(--error);
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Loading State -->
+    <div id="loading-state" class="status">
+      <div class="status-icon loading">
+        <div class="spinner"></div>
+      </div>
+      <h2>Loading...</h2>
+      <p>Fetching transaction details</p>
+    </div>
+
+    <!-- Main Approval View -->
+    <div id="approval-view" class="hidden">
+      <div class="header">
+        <div class="logo">A</div>
+        <h1>Approve Transaction</h1>
+        <p>Review and sign with Face ID</p>
+      </div>
+
+      <div id="error-container" class="error-message hidden"></div>
+
+      <div class="card">
+        <div class="card-title">Rebalance Details</div>
+        <div class="amount-display">
+          <div class="amount-value" id="amount">$0.00</div>
+          <div class="amount-label">USDC</div>
+        </div>
+        <div class="protocol-flow">
+          <div class="protocol-box">
+            <div class="protocol-name" id="from-protocol">---</div>
+            <div class="protocol-apy" id="from-apy">0.00% APY</div>
+          </div>
+          <div class="arrow">&rarr;</div>
+          <div class="protocol-box">
+            <div class="protocol-name" id="to-protocol">---</div>
+            <div class="protocol-apy" id="to-apy">0.00% APY</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Transaction Summary</div>
+        <div class="detail-row">
+          <span class="detail-label">APY Gain</span>
+          <span class="detail-value highlight" id="apy-gain">+0.00%</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Estimated Gas</span>
+          <span class="detail-value" id="gas-cost">~$0.00</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Vault</span>
+          <span class="detail-value" id="vault-address">0x...0000</span>
+        </div>
+      </div>
+
+      <button id="approve-btn" class="btn btn-primary">
+        <svg class="face-id-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="9" cy="10" r="1"/>
+          <circle cx="15" cy="10" r="1"/>
+          <path d="M9 15c.5.5 1.5 1 3 1s2.5-.5 3-1"/>
+        </svg>
+        Approve with Face ID
+      </button>
+
+      <button id="reject-btn" class="btn btn-secondary">
+        Reject
+      </button>
+
+      <div class="expiry" id="expiry-text">
+        Expires in 24 hours
+      </div>
+    </div>
+
+    <!-- Success State -->
+    <div id="success-state" class="status hidden">
+      <div class="status-icon success">
+        <span>&check;</span>
+      </div>
+      <h2>Transaction Signed</h2>
+      <p>Your transaction has been submitted to the network.</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="status hidden">
+      <div class="status-icon error">
+        <span>&times;</span>
+      </div>
+      <h2>Signing Failed</h2>
+      <p id="error-text">An error occurred while signing the transaction.</p>
+      <button id="retry-btn" class="btn btn-primary" style="margin-top: 24px;">
+        Try Again
+      </button>
+    </div>
+
+    <!-- Rejected State -->
+    <div id="rejected-state" class="status hidden">
+      <div class="status-icon error">
+        <span>&times;</span>
+      </div>
+      <h2>Transaction Rejected</h2>
+      <p>You can close this window.</p>
+    </div>
+
+    <!-- Expired State -->
+    <div id="expired-state" class="status hidden">
+      <div class="status-icon error">
+        <span>&times;</span>
+      </div>
+      <h2>Request Expired</h2>
+      <p>This approval request has expired. Please request a new one.</p>
+    </div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
