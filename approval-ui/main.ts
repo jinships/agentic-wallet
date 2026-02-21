@@ -141,10 +141,7 @@ async function fetchProposalDetails(proposalId: string): Promise<ProposalDetails
   return response.json();
 }
 
-async function submitApproval(
-  proposalId: string,
-  signature: WebAuthnSignature
-): Promise<void> {
+async function submitApproval(proposalId: string, signature: WebAuthnSignature): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/proposals/${proposalId}/approve`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -218,7 +215,7 @@ async function signWithPasskey(userOpHash: string): Promise<WebAuthnSignature> {
   const challenge = hexToBytes(userOpHash);
 
   // Get credential - this will trigger Face ID / fingerprint
-  const credential = await navigator.credentials.get({
+  const credential = (await navigator.credentials.get({
     publicKey: {
       challenge,
       timeout: 60000,
@@ -226,7 +223,7 @@ async function signWithPasskey(userOpHash: string): Promise<WebAuthnSignature> {
       rpId: window.location.hostname,
       allowCredentials: [], // Empty for discoverable credentials
     },
-  }) as PublicKeyCredential;
+  })) as PublicKeyCredential;
 
   if (!credential) {
     throw new Error('No credential received');
@@ -311,9 +308,12 @@ function hexToBytes(hex: string): Uint8Array {
 }
 
 function bytesToHex(bytes: Uint8Array): string {
-  return '0x' + Array.from(bytes)
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
+  return (
+    '0x' +
+    Array.from(bytes)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+  );
 }
 
 function bytesToBigInt(bytes: Uint8Array): bigint {
@@ -392,7 +392,8 @@ async function initialize() {
 
   // Check WebAuthn support
   if (!window.PublicKeyCredential) {
-    elements.errorText.textContent = 'WebAuthn is not supported in this browser. Please use Safari or Chrome.';
+    elements.errorText.textContent =
+      'WebAuthn is not supported in this browser. Please use Safari or Chrome.';
     showView('error');
     return;
   }
@@ -428,7 +429,8 @@ async function initialize() {
     showView('approval');
   } catch (error) {
     console.error('Initialization error:', error);
-    elements.errorText.textContent = error instanceof Error ? error.message : 'Failed to load approval details';
+    elements.errorText.textContent =
+      error instanceof Error ? error.message : 'Failed to load approval details';
     showView('error');
   }
 }

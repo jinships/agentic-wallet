@@ -4,10 +4,10 @@
  * All logs are JSON-formatted for easy parsing by log aggregation tools.
  */
 
-import type { YieldProtocol, ProtocolSnapshot, YieldComparison } from "./protocols/index.js";
-import type { RateAnomaly, TWAPResult } from "./rate-history.js";
+import type { YieldProtocol, ProtocolSnapshot, YieldComparison } from './protocols/index.js';
+import type { RateAnomaly, TWAPResult } from './rate-history.js';
 
-export type LogLevel = "debug" | "info" | "warn" | "error";
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 export interface LogContext {
   component: string;
@@ -15,18 +15,18 @@ export interface LogContext {
 }
 
 export interface RateCheckLog {
-  event: "rate_check";
+  event: 'rate_check';
   timestamp: string;
   protocols: {
-    id: YieldProtocol["id"];
+    id: YieldProtocol['id'];
     name: string;
     apy: number;
     apyPercent: string;
     balance: string;
     balanceUsd: string;
   }[];
-  bestProtocol: YieldProtocol["id"];
-  currentProtocol: YieldProtocol["id"] | null;
+  bestProtocol: YieldProtocol['id'];
+  currentProtocol: YieldProtocol['id'] | null;
   apyDifferentialBps: number;
   shouldRebalance: boolean;
   rejectReason?: string;
@@ -35,11 +35,11 @@ export interface RateCheckLog {
 }
 
 export interface RebalanceProposalLog {
-  event: "rebalance_proposal";
+  event: 'rebalance_proposal';
   timestamp: string;
   proposalId: string;
-  fromProtocol: YieldProtocol["id"];
-  toProtocol: YieldProtocol["id"];
+  fromProtocol: YieldProtocol['id'];
+  toProtocol: YieldProtocol['id'];
   amount: string;
   amountUsd: string;
   expectedApyGainBps: number;
@@ -47,7 +47,7 @@ export interface RebalanceProposalLog {
 }
 
 export interface ErrorLog {
-  event: "error";
+  event: 'error';
   timestamp: string;
   error: string;
   stack?: string;
@@ -56,11 +56,11 @@ export interface ErrorLog {
 }
 
 export interface AnomalyLog {
-  event: "rate_anomaly";
+  event: 'rate_anomaly';
   timestamp: string;
-  protocolId: YieldProtocol["id"];
+  protocolId: YieldProtocol['id'];
   anomaly: RateAnomaly;
-  action: "blocked" | "warned";
+  action: 'blocked' | 'warned';
 }
 
 type LogEntry = RateCheckLog | RebalanceProposalLog | ErrorLog | AnomalyLog;
@@ -85,8 +85,8 @@ export class Logger {
   constructor(context: LogContext, config?: Partial<LoggerConfig>) {
     this.context = context;
     this.config = {
-      level: config?.level ?? "info",
-      pretty: config?.pretty ?? process.env.NODE_ENV !== "production",
+      level: config?.level ?? 'info',
+      pretty: config?.pretty ?? process.env.NODE_ENV !== 'production',
       output: config?.output ?? console.log,
     };
   }
@@ -99,7 +99,7 @@ export class Logger {
     const base = {
       level,
       ...this.context,
-      ...(typeof entry === "string" ? { message: entry } : entry),
+      ...(typeof entry === 'string' ? { message: entry } : entry),
     };
 
     if (this.config.pretty) {
@@ -109,26 +109,26 @@ export class Logger {
   }
 
   debug(entry: LogEntry | string): void {
-    if (this.shouldLog("debug")) {
-      this.config.output(this.formatMessage("debug", entry));
+    if (this.shouldLog('debug')) {
+      this.config.output(this.formatMessage('debug', entry));
     }
   }
 
   info(entry: LogEntry | string): void {
-    if (this.shouldLog("info")) {
-      this.config.output(this.formatMessage("info", entry));
+    if (this.shouldLog('info')) {
+      this.config.output(this.formatMessage('info', entry));
     }
   }
 
   warn(entry: LogEntry | string): void {
-    if (this.shouldLog("warn")) {
-      this.config.output(this.formatMessage("warn", entry));
+    if (this.shouldLog('warn')) {
+      this.config.output(this.formatMessage('warn', entry));
     }
   }
 
   error(entry: LogEntry | string): void {
-    if (this.shouldLog("error")) {
-      this.config.output(this.formatMessage("error", entry));
+    if (this.shouldLog('error')) {
+      this.config.output(this.formatMessage('error', entry));
     }
   }
 
@@ -144,7 +144,7 @@ export class Logger {
     }
   ): void {
     const log: RateCheckLog = {
-      event: "rate_check",
+      event: 'rate_check',
       timestamp: new Date().toISOString(),
       protocols: comparison.snapshots.map((s) => ({
         id: s.protocolId,
@@ -169,14 +169,14 @@ export class Logger {
    */
   logRebalanceProposal(
     proposalId: string,
-    fromProtocol: YieldProtocol["id"],
-    toProtocol: YieldProtocol["id"],
+    fromProtocol: YieldProtocol['id'],
+    toProtocol: YieldProtocol['id'],
     amount: bigint,
     expectedApyGainBps: number,
     estimatedGasUsd?: string
   ): void {
     const log: RebalanceProposalLog = {
-      event: "rebalance_proposal",
+      event: 'rebalance_proposal',
       timestamp: new Date().toISOString(),
       proposalId,
       fromProtocol,
@@ -193,13 +193,9 @@ export class Logger {
   /**
    * Log an error.
    */
-  logError(
-    error: Error | string,
-    context?: Record<string, unknown>,
-    recoverable = true
-  ): void {
+  logError(error: Error | string, context?: Record<string, unknown>, recoverable = true): void {
     const log: ErrorLog = {
-      event: "error",
+      event: 'error',
       timestamp: new Date().toISOString(),
       error: error instanceof Error ? error.message : error,
       stack: error instanceof Error ? error.stack : undefined,
@@ -214,19 +210,19 @@ export class Logger {
    * Log a rate anomaly detection.
    */
   logAnomaly(
-    protocolId: YieldProtocol["id"],
+    protocolId: YieldProtocol['id'],
     anomaly: RateAnomaly,
-    action: "blocked" | "warned"
+    action: 'blocked' | 'warned'
   ): void {
     const log: AnomalyLog = {
-      event: "rate_anomaly",
+      event: 'rate_anomaly',
       timestamp: new Date().toISOString(),
       protocolId,
       anomaly,
       action,
     };
 
-    if (action === "blocked") {
+    if (action === 'blocked') {
       this.warn(log);
     } else {
       this.info(log);
@@ -237,10 +233,7 @@ export class Logger {
    * Create a child logger with additional context.
    */
   child(additionalContext: Partial<LogContext>): Logger {
-    return new Logger(
-      { ...this.context, ...additionalContext },
-      this.config
-    );
+    return new Logger({ ...this.context, ...additionalContext }, this.config);
   }
 }
 
@@ -250,33 +243,27 @@ export class Logger {
 function formatUSDC(amount: bigint): string {
   const whole = amount / 1_000_000n;
   const frac = amount % 1_000_000n;
-  const fracStr = frac.toString().padStart(6, "0").slice(0, 2);
+  const fracStr = frac.toString().padStart(6, '0').slice(0, 2);
   return `$${whole.toLocaleString()}.${fracStr}`;
 }
 
 /**
  * Create a logger for the yield monitor component.
  */
-export function createYieldMonitorLogger(
-  config?: Partial<LoggerConfig>
-): Logger {
-  return new Logger({ component: "yield-monitor" }, config);
+export function createYieldMonitorLogger(config?: Partial<LoggerConfig>): Logger {
+  return new Logger({ component: 'yield-monitor' }, config);
 }
 
 /**
  * Create a logger for the approval flow component.
  */
-export function createApprovalFlowLogger(
-  config?: Partial<LoggerConfig>
-): Logger {
-  return new Logger({ component: "approval-flow" }, config);
+export function createApprovalFlowLogger(config?: Partial<LoggerConfig>): Logger {
+  return new Logger({ component: 'approval-flow' }, config);
 }
 
 /**
  * Create a logger for the wallet manager component.
  */
-export function createWalletManagerLogger(
-  config?: Partial<LoggerConfig>
-): Logger {
-  return new Logger({ component: "wallet-manager" }, config);
+export function createWalletManagerLogger(config?: Partial<LoggerConfig>): Logger {
+  return new Logger({ component: 'wallet-manager' }, config);
 }

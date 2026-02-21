@@ -1,5 +1,5 @@
-import type { Address } from "viem";
-import type { ReadContractClient } from "./protocols/index.js";
+import type { Address } from 'viem';
+import type { ReadContractClient } from './protocols/index.js';
 import {
   type YieldProtocol,
   type ProtocolSnapshot,
@@ -8,11 +8,11 @@ import {
   CompoundProtocol,
   MorphoProtocol,
   MoonwellProtocol,
-} from "./protocols/index.js";
-import { fetchDeFiLlamaRates } from "./protocols/defillama.js";
-import { RateHistory, getRateHistory, type RateAnomaly } from "./rate-history.js";
-import { Logger, createYieldMonitorLogger } from "./logger.js";
-import { YIELD_CONFIG } from "./config.js";
+} from './protocols/index.js';
+import { fetchDeFiLlamaRates } from './protocols/defillama.js';
+import { RateHistory, getRateHistory, type RateAnomaly } from './rate-history.js';
+import { Logger, createYieldMonitorLogger } from './logger.js';
+import { YIELD_CONFIG } from './config.js';
 
 export interface YieldMonitorConfig {
   /** Use TWAP instead of spot rates for comparison (default: true) */
@@ -42,11 +42,11 @@ export interface ProtectedYieldComparison extends YieldComparison {
   /** Whether TWAP was used for comparison */
   twapUsed: boolean;
   /** Anomalies detected during comparison */
-  anomalies: Map<YieldProtocol["id"], RateAnomaly>;
+  anomalies: Map<YieldProtocol['id'], RateAnomaly>;
   /** Reason rebalance was blocked (if any) */
   rejectReason?: string;
   /** Data source used */
-  dataSource: "onchain" | "defillama" | "mixed";
+  dataSource: 'onchain' | 'defillama' | 'mixed';
 }
 
 /**
@@ -66,10 +66,7 @@ export class YieldMonitor {
   private readonly logger: Logger;
   private lastComparison: ProtectedYieldComparison | null = null;
 
-  constructor(
-    client: ReadContractClient,
-    config?: Partial<YieldMonitorConfig>
-  ) {
+  constructor(client: ReadContractClient, config?: Partial<YieldMonitorConfig>) {
     this.protocols = [
       new AaveProtocol(client),
       new CompoundProtocol(client),
@@ -91,7 +88,7 @@ export class YieldMonitor {
   /**
    * Get a specific protocol by ID.
    */
-  getProtocol(id: YieldProtocol["id"]): YieldProtocol | undefined {
+  getProtocol(id: YieldProtocol['id']): YieldProtocol | undefined {
     return this.protocols.find((p) => p.id === id);
   }
 
@@ -101,7 +98,7 @@ export class YieldMonitor {
    */
   async getSnapshots(vault: Address): Promise<{
     snapshots: ProtocolSnapshot[];
-    dataSource: "onchain" | "defillama" | "mixed";
+    dataSource: 'onchain' | 'defillama' | 'mixed';
   }> {
     const results: ProtocolSnapshot[] = [];
     let onchainCount = 0;
@@ -121,22 +118,21 @@ export class YieldMonitor {
           apyPercent,
           balance,
           timestamp: Date.now(),
-          source: "onchain" as const,
+          source: 'onchain' as const,
         };
       })
     );
 
     // Get DeFiLlama rates as potential fallback
-    let defillamaRates: Map<YieldProtocol["id"], number> | null = null;
+    let defillamaRates: Map<YieldProtocol['id'], number> | null = null;
     if (this.config.useDeFiLlamaFallback) {
       try {
         const defillamaData = await fetchDeFiLlamaRates();
         defillamaRates = defillamaData.rates;
       } catch (error) {
-        this.logger.logError(
-          error instanceof Error ? error : new Error(String(error)),
-          { context: "defillama_fetch" }
-        );
+        this.logger.logError(error instanceof Error ? error : new Error(String(error)), {
+          context: 'defillama_fetch',
+        });
       }
     }
 
@@ -145,7 +141,7 @@ export class YieldMonitor {
       const protocol = this.protocols[i];
       const result = onchainResults[i];
 
-      if (result.status === "fulfilled") {
+      if (result.status === 'fulfilled') {
         results.push(result.value);
         onchainCount++;
 
@@ -154,7 +150,7 @@ export class YieldMonitor {
           protocolId: protocol.id,
           apy: result.value.apyPercent,
           timestamp: result.value.timestamp,
-          source: "onchain",
+          source: 'onchain',
         });
       } else {
         // On-chain failed, try DeFiLlama fallback
@@ -184,21 +180,18 @@ export class YieldMonitor {
             protocolId: protocol.id,
             apy: defillamaApy,
             timestamp: Date.now(),
-            source: "defillama",
+            source: 'defillama',
           });
         } else {
           // Both sources failed, use last known rate from history
           const lastRate = this.rateHistory.getLatestRate(protocol.id);
 
-          this.logger.logError(
-            `Failed to get rate for ${protocol.name}`,
-            {
-              protocolId: protocol.id,
-              onchainError: result.reason,
-              defillamaAvailable: !!defillamaRates,
-              lastKnownRate: lastRate?.apy,
-            }
-          );
+          this.logger.logError(`Failed to get rate for ${protocol.name}`, {
+            protocolId: protocol.id,
+            onchainError: result.reason,
+            defillamaAvailable: !!defillamaRates,
+            lastKnownRate: lastRate?.apy,
+          });
 
           results.push({
             protocolId: protocol.id,
@@ -212,12 +205,8 @@ export class YieldMonitor {
       }
     }
 
-    const dataSource: "onchain" | "defillama" | "mixed" =
-      defillamaCount === 0
-        ? "onchain"
-        : onchainCount === 0
-          ? "defillama"
-          : "mixed";
+    const dataSource: 'onchain' | 'defillama' | 'mixed' =
+      defillamaCount === 0 ? 'onchain' : onchainCount === 0 ? 'defillama' : 'mixed';
 
     return { snapshots: results, dataSource };
   }
@@ -228,19 +217,16 @@ export class YieldMonitor {
   async compareYields(vault: Address): Promise<ProtectedYieldComparison> {
     const { snapshots, dataSource } = await this.getSnapshots(vault);
     const timestamp = Date.now();
-    const anomalies = new Map<YieldProtocol["id"], RateAnomaly>();
+    const anomalies = new Map<YieldProtocol['id'], RateAnomaly>();
 
     // Check for anomalies if enabled
     if (this.config.enableAnomalyDetection) {
       for (const snapshot of snapshots) {
-        const anomaly = this.rateHistory.detectAnomalies(
-          snapshot.protocolId,
-          snapshot.apyPercent
-        );
+        const anomaly = this.rateHistory.detectAnomalies(snapshot.protocolId, snapshot.apyPercent);
 
         if (anomaly.suspicious) {
           anomalies.set(snapshot.protocolId, anomaly);
-          this.logger.logAnomaly(snapshot.protocolId, anomaly, "warned");
+          this.logger.logAnomaly(snapshot.protocolId, anomaly, 'warned');
         }
       }
     }
@@ -273,27 +259,24 @@ export class YieldMonitor {
     );
 
     // Find where the vault currently has funds (if any)
-    const currentProtocol =
-      effectiveSnapshots.find((s) => s.balance > 0n) || null;
+    const currentProtocol = effectiveSnapshots.find((s) => s.balance > 0n) || null;
 
     // Calculate APY differential in basis points
     const currentApy = currentProtocol?.apyPercent ?? 0;
-    const apyDifferentialBps = Math.round(
-      (bestProtocol.apyPercent - currentApy) * 10000
-    );
+    const apyDifferentialBps = Math.round((bestProtocol.apyPercent - currentApy) * 10000);
 
     // Determine if we should rebalance with protection checks
     let shouldRebalance = false;
     let rejectReason: string | undefined;
 
     if (currentProtocol === null) {
-      rejectReason = "no_funds_to_move";
+      rejectReason = 'no_funds_to_move';
     } else if (currentProtocol.protocolId === bestProtocol.protocolId) {
-      rejectReason = "already_in_best_protocol";
+      rejectReason = 'already_in_best_protocol';
     } else if (apyDifferentialBps < YIELD_CONFIG.MIN_APY_DIFFERENTIAL_BPS) {
-      rejectReason = "apy_differential_below_threshold";
+      rejectReason = 'apy_differential_below_threshold';
     } else if (anomalies.has(bestProtocol.protocolId)) {
-      rejectReason = "target_protocol_anomaly_detected";
+      rejectReason = 'target_protocol_anomaly_detected';
     } else {
       shouldRebalance = true;
     }
@@ -343,14 +326,12 @@ export class YieldMonitor {
   formatComparison(comparison: ProtectedYieldComparison): string {
     const lines: string[] = [];
 
-    lines.push("=== Yield Comparison ===");
-    lines.push(`Data source: ${comparison.dataSource}${comparison.twapUsed ? " (TWAP)" : ""}`);
-    lines.push("");
+    lines.push('=== Yield Comparison ===');
+    lines.push(`Data source: ${comparison.dataSource}${comparison.twapUsed ? ' (TWAP)' : ''}`);
+    lines.push('');
 
     // Sort by APY descending
-    const sorted = [...comparison.snapshots].sort(
-      (a, b) => b.apyPercent - a.apyPercent
-    );
+    const sorted = [...comparison.snapshots].sort((a, b) => b.apyPercent - a.apyPercent);
 
     for (const snapshot of sorted) {
       const apyStr = (snapshot.apyPercent * 100).toFixed(2);
@@ -358,18 +339,16 @@ export class YieldMonitor {
       const anomaly = comparison.anomalies.get(snapshot.protocolId);
       const marker =
         snapshot.protocolId === comparison.bestProtocol.protocolId
-          ? " [BEST]"
+          ? ' [BEST]'
           : snapshot.protocolId === comparison.currentProtocol?.protocolId
-            ? " [CURRENT]"
-            : "";
-      const warning = anomaly?.suspicious ? " [ANOMALY]" : "";
+            ? ' [CURRENT]'
+            : '';
+      const warning = anomaly?.suspicious ? ' [ANOMALY]' : '';
 
-      lines.push(
-        `${snapshot.protocolName}: ${apyStr}% APY, $${balanceStr}${marker}${warning}`
-      );
+      lines.push(`${snapshot.protocolName}: ${apyStr}% APY, $${balanceStr}${marker}${warning}`);
     }
 
-    lines.push("");
+    lines.push('');
     lines.push(
       `APY Differential: ${comparison.apyDifferentialBps} bps (${(comparison.apyDifferentialBps / 100).toFixed(2)}%)`
     );
@@ -377,17 +356,17 @@ export class YieldMonitor {
     if (comparison.rejectReason) {
       lines.push(`Rebalance: NO (${comparison.rejectReason})`);
     } else {
-      lines.push(`Rebalance: ${comparison.shouldRebalance ? "YES" : "NO"}`);
+      lines.push(`Rebalance: ${comparison.shouldRebalance ? 'YES' : 'NO'}`);
     }
 
     if (comparison.shouldRebalance && comparison.currentProtocol) {
-      lines.push("");
+      lines.push('');
       lines.push(
         `Recommended: Move from ${comparison.currentProtocol.protocolName} to ${comparison.bestProtocol.protocolName}`
       );
     }
 
-    return lines.join("\n");
+    return lines.join('\n');
   }
 }
 
@@ -397,7 +376,7 @@ export class YieldMonitor {
 function formatUSDC(amount: bigint): string {
   const whole = amount / 1_000_000n;
   const frac = amount % 1_000_000n;
-  const fracStr = frac.toString().padStart(6, "0").slice(0, 2);
+  const fracStr = frac.toString().padStart(6, '0').slice(0, 2);
   return `${whole.toLocaleString()}.${fracStr}`;
 }
 
@@ -405,8 +384,8 @@ function formatUSDC(amount: bigint): string {
  * Rebalancing proposal for the agent to submit.
  */
 export interface RebalanceProposal {
-  fromProtocol: YieldProtocol["id"];
-  toProtocol: YieldProtocol["id"];
+  fromProtocol: YieldProtocol['id'];
+  toProtocol: YieldProtocol['id'];
   amount: bigint;
   expectedApyGainBps: number;
   withdrawCalldata: `0x${string}`;

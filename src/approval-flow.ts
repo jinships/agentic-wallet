@@ -236,11 +236,7 @@ export class ApprovalFlow {
   /**
    * Generate the approval UI URL with encoded parameters
    */
-  private generateApprovalUrl(
-    proposalId: string,
-    userOpHash: Hex,
-    vaultAddress: Address
-  ): string {
+  private generateApprovalUrl(proposalId: string, userOpHash: Hex, vaultAddress: Address): string {
     const params = new URLSearchParams({
       id: proposalId,
       hash: userOpHash,
@@ -254,10 +250,7 @@ export class ApprovalFlow {
    * Format a human-readable notification message.
    * OpenClaw can use this directly or customize it.
    */
-  private formatNotificationMessage(
-    data: ApprovalDisplayData,
-    expiresAt: Date
-  ): string {
+  private formatNotificationMessage(data: ApprovalDisplayData, expiresAt: Date): string {
     const expiresIn = Math.round((expiresAt.getTime() - Date.now()) / 3600000);
 
     return [
@@ -287,9 +280,7 @@ export class ApprovalFlow {
     const pendingRequest = this.pendingApprovals.get(response.proposalId);
 
     if (!pendingRequest) {
-      throw new ApprovalFlowError(
-        `No pending approval found for proposal ${response.proposalId}`
-      );
+      throw new ApprovalFlowError(`No pending approval found for proposal ${response.proposalId}`);
     }
 
     // Check expiry
@@ -393,9 +384,7 @@ export class ApprovalFlow {
       const result = await this.walletManager.waitForUserOp(userOpHash, 60_000);
 
       if (proposal) {
-        proposal.status = result.success
-          ? ProposalStatus.EXECUTED
-          : ProposalStatus.FAILED;
+        proposal.status = result.success ? ProposalStatus.EXECUTED : ProposalStatus.FAILED;
       }
 
       this.logAudit({
@@ -488,10 +477,7 @@ export class ApprovalFlow {
 
     // Also log to console in development
     if (process.env.NODE_ENV !== 'production') {
-      console.log(
-        `[AUDIT] ${entry.eventType}`,
-        JSON.stringify(entry, null, 2)
-      );
+      console.log(`[AUDIT] ${entry.eventType}`, JSON.stringify(entry, null, 2));
     }
   }
 }

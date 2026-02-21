@@ -1,47 +1,43 @@
-import {
-  type Address,
-  type Hex,
-  encodeFunctionData,
-} from "viem";
-import type { YieldProtocol, ReadContractClient } from "./index.js";
-import { ADDRESSES, SECONDS_PER_YEAR } from "../config.js";
+import { type Address, type Hex, encodeFunctionData } from 'viem';
+import type { YieldProtocol, ReadContractClient } from './index.js';
+import { ADDRESSES, SECONDS_PER_YEAR } from '../config.js';
 
 // Moonwell mToken ABI (Compound V2 style)
 const MTOKEN_ABI = [
   {
-    name: "supplyRatePerTimestamp",
-    type: "function",
-    stateMutability: "view",
+    name: 'supplyRatePerTimestamp',
+    type: 'function',
+    stateMutability: 'view',
     inputs: [],
-    outputs: [{ name: "", type: "uint256" }],
+    outputs: [{ name: '', type: 'uint256' }],
   },
   {
-    name: "balanceOf",
-    type: "function",
-    stateMutability: "view",
-    inputs: [{ name: "account", type: "address" }],
-    outputs: [{ name: "", type: "uint256" }],
+    name: 'balanceOf',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [{ name: 'account', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }],
   },
   {
-    name: "exchangeRateStored",
-    type: "function",
-    stateMutability: "view",
+    name: 'exchangeRateStored',
+    type: 'function',
+    stateMutability: 'view',
     inputs: [],
-    outputs: [{ name: "", type: "uint256" }],
+    outputs: [{ name: '', type: 'uint256' }],
   },
   {
-    name: "mint",
-    type: "function",
-    stateMutability: "nonpayable",
-    inputs: [{ name: "mintAmount", type: "uint256" }],
-    outputs: [{ name: "", type: "uint256" }],
+    name: 'mint',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [{ name: 'mintAmount', type: 'uint256' }],
+    outputs: [{ name: '', type: 'uint256' }],
   },
   {
-    name: "redeemUnderlying",
-    type: "function",
-    stateMutability: "nonpayable",
-    inputs: [{ name: "redeemAmount", type: "uint256" }],
-    outputs: [{ name: "", type: "uint256" }],
+    name: 'redeemUnderlying',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [{ name: 'redeemAmount', type: 'uint256' }],
+    outputs: [{ name: '', type: 'uint256' }],
   },
 ] as const;
 
@@ -52,9 +48,9 @@ const RATE_MANTISSA = 10n ** 18n;
 const EXCHANGE_RATE_SCALE = 10n ** 20n;
 
 export class MoonwellProtocol implements YieldProtocol {
-  readonly name = "Moonwell";
+  readonly name = 'Moonwell';
   readonly address = ADDRESSES.MOONWELL_MUSDC;
-  readonly id = "moonwell" as const;
+  readonly id = 'moonwell' as const;
 
   constructor(private readonly client: ReadContractClient) {}
 
@@ -63,7 +59,7 @@ export class MoonwellProtocol implements YieldProtocol {
     const supplyRate = await this.client.readContract({
       address: this.address,
       abi: MTOKEN_ABI,
-      functionName: "supplyRatePerTimestamp",
+      functionName: 'supplyRatePerTimestamp',
     });
 
     // Convert to annual rate
@@ -75,23 +71,23 @@ export class MoonwellProtocol implements YieldProtocol {
 
   async getBalance(vault: Address): Promise<bigint> {
     // Get mToken balance
-    const mTokenBalance = await this.client.readContract({
+    const mTokenBalance = (await this.client.readContract({
       address: this.address,
       abi: MTOKEN_ABI,
-      functionName: "balanceOf",
+      functionName: 'balanceOf',
       args: [vault],
-    }) as bigint;
+    })) as bigint;
 
     if (mTokenBalance === 0n) {
       return 0n;
     }
 
     // Get exchange rate to convert to underlying
-    const exchangeRate = await this.client.readContract({
+    const exchangeRate = (await this.client.readContract({
       address: this.address,
       abi: MTOKEN_ABI,
-      functionName: "exchangeRateStored",
-    }) as bigint;
+      functionName: 'exchangeRateStored',
+    })) as bigint;
 
     // underlying = mTokenBalance * exchangeRate / EXCHANGE_RATE_SCALE
     const underlying = (mTokenBalance * exchangeRate) / EXCHANGE_RATE_SCALE;
@@ -103,7 +99,7 @@ export class MoonwellProtocol implements YieldProtocol {
     // mint() takes the underlying amount and mints mTokens to msg.sender
     return encodeFunctionData({
       abi: MTOKEN_ABI,
-      functionName: "mint",
+      functionName: 'mint',
       args: [amount],
     });
   }
@@ -112,7 +108,7 @@ export class MoonwellProtocol implements YieldProtocol {
     // redeemUnderlying() redeems a specific amount of underlying to msg.sender
     return encodeFunctionData({
       abi: MTOKEN_ABI,
-      functionName: "redeemUnderlying",
+      functionName: 'redeemUnderlying',
       args: [amount],
     });
   }

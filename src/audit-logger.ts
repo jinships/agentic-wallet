@@ -66,9 +66,7 @@ export class InMemoryAuditStorage implements AuditStorage {
   }
 
   async queryByProposal(proposalId: string): Promise<AuditLogEntry[]> {
-    return this.entries
-      .filter((e) => e.proposalId === proposalId)
-      .reverse();
+    return this.entries.filter((e) => e.proposalId === proposalId).reverse();
   }
 
   async queryByEventType(eventType: AuditEventType, limit = 100): Promise<AuditLogEntry[]> {
@@ -170,9 +168,7 @@ export class FileAuditStorage implements AuditStorage {
 
   async queryByTimeRange(start: Date, end: Date, limit = 1000): Promise<AuditLogEntry[]> {
     const entries = await this.readRecentEntries(limit * 2);
-    return entries
-      .filter((e) => e.timestamp >= start && e.timestamp <= end)
-      .slice(0, limit);
+    return entries.filter((e) => e.timestamp >= start && e.timestamp <= end).slice(0, limit);
   }
 
   async deleteOlderThan(date: Date): Promise<number> {
@@ -347,10 +343,7 @@ export class AuditLogger {
   /**
    * Log approval expiry
    */
-  async logApprovalExpired(
-    vaultAddress: Address,
-    proposalId: string
-  ): Promise<void> {
+  async logApprovalExpired(vaultAddress: Address, proposalId: string): Promise<void> {
     await this.log({
       eventType: AuditEventType.APPROVAL_EXPIRED,
       vaultAddress,
@@ -457,9 +450,7 @@ export class AuditLogger {
 
   // ============ Core Logging ============
 
-  private async log(
-    params: Omit<AuditLogEntry, 'id' | 'timestamp'>
-  ): Promise<void> {
+  private async log(params: Omit<AuditLogEntry, 'id' | 'timestamp'>): Promise<void> {
     const entry: AuditLogEntry = {
       id: nanoid(16),
       timestamp: new Date(),
@@ -507,14 +498,8 @@ export class AuditLogger {
   }
 
   async getRecentExecutions(limit = 50): Promise<AuditLogEntry[]> {
-    const success = await this.storage.queryByEventType(
-      AuditEventType.EXECUTION_SUCCESS,
-      limit
-    );
-    const failed = await this.storage.queryByEventType(
-      AuditEventType.EXECUTION_FAILED,
-      limit
-    );
+    const success = await this.storage.queryByEventType(AuditEventType.EXECUTION_SUCCESS, limit);
+    const failed = await this.storage.queryByEventType(AuditEventType.EXECUTION_FAILED, limit);
 
     return [...success, ...failed]
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())

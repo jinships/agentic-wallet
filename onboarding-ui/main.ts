@@ -20,9 +20,9 @@ const CONFIG = {
   factoryAddress: '0x74fa96F0A20A2A863E0921beBB6B398D969e096C' as `0x${string}`,
 
   // Default vault configuration
-  dailyLimit: 10000n * 10n ** 6n,        // $10,000 USDC
+  dailyLimit: 10000n * 10n ** 6n, // $10,000 USDC
   autoExecuteThreshold: 100n * 10n ** 6n, // $100 USDC
-  sessionKeyDailyCap: 1000n * 10n ** 6n,  // $1,000 USDC
+  sessionKeyDailyCap: 1000n * 10n ** 6n, // $1,000 USDC
 
   // Whitelisted protocols (Base mainnet)
   protocols: [
@@ -163,8 +163,8 @@ async function createPasskey(): Promise<PasskeyCredential> {
       ],
       authenticatorSelection: {
         authenticatorAttachment: 'platform', // Use device's built-in authenticator
-        userVerification: 'required',        // Require Face ID / fingerprint
-        residentKey: 'required',             // Discoverable credential (passkey)
+        userVerification: 'required', // Require Face ID / fingerprint
+        residentKey: 'required', // Discoverable credential (passkey)
       },
       timeout: 60000,
       attestation: 'none', // Don't need attestation for our use case
@@ -172,7 +172,7 @@ async function createPasskey(): Promise<PasskeyCredential> {
   };
 
   // Create the credential
-  const credential = await navigator.credentials.create(createOptions) as PublicKeyCredential;
+  const credential = (await navigator.credentials.create(createOptions)) as PublicKeyCredential;
 
   if (!credential) {
     throw new Error('Failed to create passkey');
@@ -273,7 +273,12 @@ function bigIntToHex(value: bigint): string {
  * Convert a Uint8Array to a hex string.
  */
 function bytesToHex(bytes: Uint8Array): string {
-  return '0x' + Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+  return (
+    '0x' +
+    Array.from(bytes)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+  );
 }
 
 // ============ Vault Address Computation ============
@@ -296,7 +301,12 @@ async function computeVaultAddress(ownerX: bigint, ownerY: bigint): Promise<stri
   const combined = bigIntToHex(ownerX) + bigIntToHex(ownerY).slice(2);
   const hashBytes = await crypto.subtle.digest('SHA-256', hexToBytes(combined));
   const hash = new Uint8Array(hashBytes);
-  return '0x' + Array.from(hash.slice(0, 20)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return (
+    '0x' +
+    Array.from(hash.slice(0, 20))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+  );
 }
 
 /**
@@ -328,7 +338,7 @@ async function callGetVaultAddress(ownerX: bigint, ownerY: bigint): Promise<stri
     }),
   });
 
-  const result = await response.json() as { result?: string; error?: { message: string } };
+  const result = (await response.json()) as { result?: string; error?: { message: string } };
 
   if (result.error) {
     throw new Error(`RPC error: ${result.error.message}`);
@@ -378,10 +388,7 @@ async function handleCreateWallet(): Promise<void> {
     });
 
     // Compute the vault address
-    const vaultAddress = await computeVaultAddress(
-      credential.publicKey.x,
-      credential.publicKey.y
-    );
+    const vaultAddress = await computeVaultAddress(credential.publicKey.x, credential.publicKey.y);
     currentVaultAddress = vaultAddress;
 
     // Update the UI
@@ -404,7 +411,6 @@ async function handleCreateWallet(): Promise<void> {
     console.log('===============================================\n');
 
     showView('success');
-
   } catch (error) {
     console.error('Failed to create wallet:', error);
 

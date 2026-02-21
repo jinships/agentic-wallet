@@ -224,21 +224,30 @@ export interface AuditLogEntry {
 // ============ Error Types ============
 
 export class UserOpBuildError extends Error {
-  constructor(message: string, public readonly cause?: Error) {
+  constructor(
+    message: string,
+    public readonly cause?: Error
+  ) {
     super(message);
     this.name = 'UserOpBuildError';
   }
 }
 
 export class ApprovalFlowError extends Error {
-  constructor(message: string, public readonly cause?: Error) {
+  constructor(
+    message: string,
+    public readonly cause?: Error
+  ) {
     super(message);
     this.name = 'ApprovalFlowError';
   }
 }
 
 export class SessionKeyError extends Error {
-  constructor(message: string, public readonly cause?: Error) {
+  constructor(
+    message: string,
+    public readonly cause?: Error
+  ) {
     super(message);
     this.name = 'SessionKeyError';
   }

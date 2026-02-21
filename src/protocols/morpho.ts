@@ -1,61 +1,57 @@
-import {
-  type Address,
-  type Hex,
-  encodeFunctionData,
-} from "viem";
-import type { YieldProtocol, ReadContractClient } from "./index.js";
-import { ADDRESSES, SECONDS_PER_YEAR } from "../config.js";
+import { type Address, type Hex, encodeFunctionData } from 'viem';
+import type { YieldProtocol, ReadContractClient } from './index.js';
+import { ADDRESSES, SECONDS_PER_YEAR } from '../config.js';
 
 // ERC-4626 Vault ABI (Morpho uses standard ERC-4626)
 const ERC4626_ABI = [
   {
-    name: "totalAssets",
-    type: "function",
-    stateMutability: "view",
+    name: 'totalAssets',
+    type: 'function',
+    stateMutability: 'view',
     inputs: [],
-    outputs: [{ name: "", type: "uint256" }],
+    outputs: [{ name: '', type: 'uint256' }],
   },
   {
-    name: "totalSupply",
-    type: "function",
-    stateMutability: "view",
+    name: 'totalSupply',
+    type: 'function',
+    stateMutability: 'view',
     inputs: [],
-    outputs: [{ name: "", type: "uint256" }],
+    outputs: [{ name: '', type: 'uint256' }],
   },
   {
-    name: "balanceOf",
-    type: "function",
-    stateMutability: "view",
-    inputs: [{ name: "account", type: "address" }],
-    outputs: [{ name: "", type: "uint256" }],
+    name: 'balanceOf',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [{ name: 'account', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }],
   },
   {
-    name: "convertToAssets",
-    type: "function",
-    stateMutability: "view",
-    inputs: [{ name: "shares", type: "uint256" }],
-    outputs: [{ name: "", type: "uint256" }],
+    name: 'convertToAssets',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [{ name: 'shares', type: 'uint256' }],
+    outputs: [{ name: '', type: 'uint256' }],
   },
   {
-    name: "deposit",
-    type: "function",
-    stateMutability: "nonpayable",
+    name: 'deposit',
+    type: 'function',
+    stateMutability: 'nonpayable',
     inputs: [
-      { name: "assets", type: "uint256" },
-      { name: "receiver", type: "address" },
+      { name: 'assets', type: 'uint256' },
+      { name: 'receiver', type: 'address' },
     ],
-    outputs: [{ name: "shares", type: "uint256" }],
+    outputs: [{ name: 'shares', type: 'uint256' }],
   },
   {
-    name: "withdraw",
-    type: "function",
-    stateMutability: "nonpayable",
+    name: 'withdraw',
+    type: 'function',
+    stateMutability: 'nonpayable',
     inputs: [
-      { name: "assets", type: "uint256" },
-      { name: "receiver", type: "address" },
-      { name: "owner", type: "address" },
+      { name: 'assets', type: 'uint256' },
+      { name: 'receiver', type: 'address' },
+      { name: 'owner', type: 'address' },
     ],
-    outputs: [{ name: "shares", type: "uint256" }],
+    outputs: [{ name: 'shares', type: 'uint256' }],
   },
 ] as const;
 
@@ -65,9 +61,9 @@ const SHARE_PRICE_CACHE = new Map<string, { price: number; timestamp: number }>(
 const APY_SAMPLE_PERIOD = 24 * 60 * 60 * 1000; // 24 hours in ms
 
 export class MorphoProtocol implements YieldProtocol {
-  readonly name = "Morpho Blue (Spark)";
+  readonly name = 'Morpho Blue (Spark)';
   readonly address = ADDRESSES.MORPHO_SPARK_VAULT;
-  readonly id = "morpho" as const;
+  readonly id = 'morpho' as const;
 
   constructor(private readonly client: ReadContractClient) {}
 
@@ -77,12 +73,12 @@ export class MorphoProtocol implements YieldProtocol {
       this.client.readContract({
         address: this.address,
         abi: ERC4626_ABI,
-        functionName: "totalAssets",
+        functionName: 'totalAssets',
       }),
       this.client.readContract({
         address: this.address,
         abi: ERC4626_ABI,
-        functionName: "totalSupply",
+        functionName: 'totalSupply',
       }),
     ]);
 
@@ -120,24 +116,24 @@ export class MorphoProtocol implements YieldProtocol {
 
   async getBalance(vault: Address): Promise<bigint> {
     // Get share balance
-    const shares = await this.client.readContract({
+    const shares = (await this.client.readContract({
       address: this.address,
       abi: ERC4626_ABI,
-      functionName: "balanceOf",
+      functionName: 'balanceOf',
       args: [vault],
-    }) as bigint;
+    })) as bigint;
 
     if (shares === 0n) {
       return 0n;
     }
 
     // Convert shares to underlying assets (USDC)
-    const assets = await this.client.readContract({
+    const assets = (await this.client.readContract({
       address: this.address,
       abi: ERC4626_ABI,
-      functionName: "convertToAssets",
+      functionName: 'convertToAssets',
       args: [shares],
-    }) as bigint;
+    })) as bigint;
 
     return assets;
   }
@@ -145,7 +141,7 @@ export class MorphoProtocol implements YieldProtocol {
   encodeDeposit(amount: bigint, vault: Address): Hex {
     return encodeFunctionData({
       abi: ERC4626_ABI,
-      functionName: "deposit",
+      functionName: 'deposit',
       args: [amount, vault],
     });
   }
@@ -155,7 +151,7 @@ export class MorphoProtocol implements YieldProtocol {
     // The vault is both the receiver and owner of the shares
     return encodeFunctionData({
       abi: ERC4626_ABI,
-      functionName: "withdraw",
+      functionName: 'withdraw',
       args: [amount, vault, vault],
     });
   }
