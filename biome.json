@@ -21,6 +21,7 @@
       },
       "style": {
         "noNonNullAssertion": "off",
+        "noInferrableTypes": "off",
         "useImportType": "off",
         "useNodejsImportProtocol": "off",
         "useExponentiationOperator": "off",
