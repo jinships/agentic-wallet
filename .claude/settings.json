@@ -1,0 +1,10 @@
+{
+  "ignore": [
+    ".env",
+    ".env.*",
+    "*.pem",
+    "*.key",
+    "**/secrets/**",
+    "**/.secrets/**"
+  ]
+}
