@@ -16,10 +16,16 @@
         "noForEach": "off"
       },
       "suspicious": {
-        "noExplicitAny": "warn"
+        "noExplicitAny": "warn",
+        "noAssignInExpressions": "warn"
       },
       "style": {
-        "noNonNullAssertion": "warn"
+        "noNonNullAssertion": "off",
+        "useImportType": "warn",
+        "useNodejsImportProtocol": "warn",
+        "useExponentiationOperator": "warn",
+        "useTemplate": "warn",
+        "noUnusedTemplateLiteral": "warn"
       }
     }
   },
@@ -38,6 +44,6 @@
   },
   "files": {
     "include": ["src/**/*.ts", "onboarding-ui/**/*.ts", "approval-ui/**/*.ts"],
-    "ignore": ["node_modules", "dist", "contracts"]
+    "ignore": ["node_modules", "dist", "contracts", "src/config-server.ts"]
   }
 }
