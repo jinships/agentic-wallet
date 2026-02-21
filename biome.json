@@ -25,7 +25,10 @@
         "useNodejsImportProtocol": "warn",
         "useExponentiationOperator": "warn",
         "useTemplate": "warn",
-        "noUnusedTemplateLiteral": "warn"
+        "noUnusedTemplateLiteral": "warn",
+        "useNumberNamespace": "warn",
+        "noParameterAssign": "warn",
+        "useDefaultParameterLast": "warn"
       }
     }
   },
