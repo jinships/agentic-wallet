@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AgentVault - Create Wallet</title>
+  <style>
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #1a1a1a;
+      --bg-card: #252525;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0a0;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #22c55e;
+      --error: #ef4444;
+      --border: #333333;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      border-radius: 16px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      color: var(--text-secondary);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .feature-list {
+      list-style: none;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .feature-item:last-child {
+      border-bottom: none;
+    }
+
+    .feature-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(59, 130, 246, 0.15);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .feature-text h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .feature-text p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 18px 24px;
+      border-radius: 14px;
+      font-size: 17px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      margin-top: 12px;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-secondary);
+    }
+
+    .face-id-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .status {
+      text-align: center;
+      padding: 32px;
+    }
+
+    .status-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 40px;
+    }
+
+    .status-icon.success {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+    }
+
+    .status-icon.error {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--error);
+    }
+
+    .status-icon.loading {
+      background: rgba(59, 130, 246, 0.15);
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .status h2 {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+    .status p {
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      color: var(--error);
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .vault-address {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 20px 0;
+      word-break: break-all;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .vault-address-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .copy-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--bg-secondary);
+    }
+
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .step {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+
+    .step.active {
+      background: var(--accent);
+      width: 24px;
+      border-radius: 4px;
+    }
+
+    .step.completed {
+      background: var(--success);
+    }
+
+    .info-box {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+
+    .config-section {
+      margin-top: 24px;
+    }
+
+    .config-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .config-row:last-child {
+      border-bottom: none;
+    }
+
+    .config-label {
+      font-size: 15px;
+    }
+
+    .config-value {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--accent);
+    }
+
+    .next-steps {
+      margin-top: 24px;
+    }
+
+    .next-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+    }
+
+    .step-number {
+      width: 28px;
+      height: 28px;
+      background: var(--bg-secondary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .step-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Step 1: Welcome -->
+    <div id="welcome-view">
+      <div class="step-indicator">
+        <div class="step active"></div>
+        <div class="step"></div>
+        <div class="step"></div>
+      </div>
+
+      <div class="header">
+        <div class="logo">A</div>
+        <h1>AgentVault</h1>
+        <p>AI-powered yield optimization for your stablecoins. Secured by passkeys.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">How It Works</div>
+        <ul class="feature-list">
+          <li class="feature-item">
+            <div class="feature-icon">1</div>
+            <div class="feature-text">
+              <h3>Create with Face ID</h3>
+              <p>Your wallet is secured by your device's biometrics. No seed phrases to remember.</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <div class="feature-icon">2</div>
+            <div class="feature-text">
+              <h3>Deposit USDC</h3>
+              <p>Send USDC to your vault address on Base network.</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <div class="feature-icon">3</div>
+            <div class="feature-text">
+              <h3>Agent Optimizes</h3>
+              <p>AI agent monitors yields and rebalances to the best protocol automatically.</p>
+            </div>
+          </li>
+          <li class="feature-item">
+            <div class="feature-icon">4</div>
+            <div class="feature-text">
+              <h3>You Stay in Control</h3>
+              <p>Large moves require your Face ID approval. Agent has daily limits.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <button id="create-btn" class="btn btn-primary">
+        <svg class="face-id-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="9" cy="10" r="1"/>
+          <circle cx="15" cy="10" r="1"/>
+          <path d="M9 15c.5.5 1.5 1 3 1s2.5-.5 3-1"/>
+        </svg>
+        Create Wallet with Face ID
+      </button>
+
+      <div class="info-box">
+        Your passkey syncs via iCloud Keychain (iOS) or Google Password Manager (Android) for backup and multi-device access.
+      </div>
+    </div>
+
+    <!-- Step 2: Creating -->
+    <div id="creating-view" class="status hidden">
+      <div class="step-indicator">
+        <div class="step completed"></div>
+        <div class="step active"></div>
+        <div class="step"></div>
+      </div>
+
+      <div class="status-icon loading">
+        <div class="spinner"></div>
+      </div>
+      <h2>Creating Your Wallet</h2>
+      <p>Setting up your secure vault on Base network...</p>
+    </div>
+
+    <!-- Step 3: Success -->
+    <div id="success-view" class="hidden">
+      <div class="step-indicator">
+        <div class="step completed"></div>
+        <div class="step completed"></div>
+        <div class="step active"></div>
+      </div>
+
+      <div class="status">
+        <div class="status-icon success">
+          <span>&#10003;</span>
+        </div>
+        <h2>Wallet Created!</h2>
+        <p>Your AgentVault is ready. Send USDC to start earning optimized yields.</p>
+      </div>
+
+      <div class="card">
+        <div class="vault-address-label">Your Vault Address (Base)</div>
+        <div class="vault-address" id="vault-address">0x...</div>
+        <center>
+          <button id="copy-btn" class="copy-btn">Copy Address</button>
+        </center>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Vault Configuration</div>
+        <div class="config-row">
+          <span class="config-label">Daily Limit</span>
+          <span class="config-value">$10,000</span>
+        </div>
+        <div class="config-row">
+          <span class="config-label">Auto-Execute Threshold</span>
+          <span class="config-value">$100</span>
+        </div>
+        <div class="config-row">
+          <span class="config-label">Session Key Daily Cap</span>
+          <span class="config-value">$1,000</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Next Steps</div>
+        <div class="next-steps">
+          <div class="next-step">
+            <div class="step-number">1</div>
+            <div class="step-text">Send USDC to your vault address on Base</div>
+          </div>
+          <div class="next-step">
+            <div class="step-number">2</div>
+            <div class="step-text">Agent will deposit to highest-yield protocol</div>
+          </div>
+          <div class="next-step">
+            <div class="step-number">3</div>
+            <div class="step-text">Approve rebalances via Face ID when notified</div>
+          </div>
+        </div>
+      </div>
+
+      <button id="done-btn" class="btn btn-primary">
+        Done
+      </button>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-view" class="status hidden">
+      <div class="status-icon error">
+        <span>&times;</span>
+      </div>
+      <h2>Creation Failed</h2>
+      <p id="error-text">An error occurred while creating your wallet.</p>
+      <button id="retry-btn" class="btn btn-primary" style="margin-top: 24px;">
+        Try Again
+      </button>
+    </div>
+
+    <!-- Not Supported -->
+    <div id="not-supported-view" class="status hidden">
+      <div class="status-icon error">
+        <span>!</span>
+      </div>
+      <h2>Passkeys Not Supported</h2>
+      <p>Your browser doesn't support passkeys. Please use Safari on iOS 16+, Chrome on Android 9+, or a modern desktop browser.</p>
+    </div>
+  </div>
+
+  <script type="module" src="main.ts"></script>
+</body>
+</html>
