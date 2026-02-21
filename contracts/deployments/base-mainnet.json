@@ -1,0 +1,27 @@
+{
+  "network": "base-mainnet",
+  "chainId": 8453,
+  "deployedAt": "2026-02-21",
+  "deployer": "0xb186788F96D7A69Ee6464DF5Dc610802a873E7b5",
+  "contracts": {
+    "AgentVault": {
+      "address": "0x8BC998ddCe53A52f6944178f7987fF384B467301",
+      "txHash": "0xce87b7229398c4b29a0924bcc251d3917af038f4fe34d24e81c9ef34239e5128",
+      "blockNumber": 42456270,
+      "type": "implementation"
+    },
+    "AgentVaultFactory": {
+      "address": "0x74fa96F0A20A2A863E0921beBB6B398D969e096C",
+      "txHash": "0x0e73d259eb550c234dc99fa63ce6ca01187cd2e82fc7556471fd65b00098e8df",
+      "blockNumber": 42456270,
+      "type": "factory"
+    }
+  },
+  "whitelistedProtocols": {
+    "USDC": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "AaveV3Pool": "0xA238Dd80C259a72e81d7e4664a9801593F98d1c5",
+    "CompoundV3": "0xb125E6687d4313864e53df431d5425969c15Eb2F",
+    "MorphoSparkVault": "0x7BfA7C4f149E7415b73bdeDfe609237e29CBF34A",
+    "MoonwellUSDC": "0xEdc817A28E8B93B03976FBd4a3dDBc9f7D176c22"
+  }
+}
