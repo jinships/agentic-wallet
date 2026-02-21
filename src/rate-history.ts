@@ -7,19 +7,19 @@
  * 3. Flagging anomalies that could indicate manipulation
  */
 
-import type { YieldProtocol } from "./protocols/index.js";
+import type { YieldProtocol } from './protocols/index.js';
 
 export interface RateEntry {
-  protocolId: YieldProtocol["id"];
+  protocolId: YieldProtocol['id'];
   apy: number;
   timestamp: number;
-  source: "onchain" | "defillama";
+  source: 'onchain' | 'defillama';
 }
 
 export interface RateAnomaly {
   suspicious: boolean;
   reason?: string;
-  severity?: "low" | "medium" | "high";
+  severity?: 'low' | 'medium' | 'high';
   details?: {
     currentRate: number;
     previousRate: number;
@@ -42,7 +42,7 @@ const RATE_VELOCITY_THRESHOLD = 0.5; // 50% change = suspicious
 const RATE_VELOCITY_WINDOW_MS = 60 * 60 * 1000; // 1 hour window for velocity check
 
 export class RateHistory {
-  private history: Map<YieldProtocol["id"], RateEntry[]> = new Map();
+  private history: Map<YieldProtocol['id'], RateEntry[]> = new Map();
   private readonly windowMs: number;
 
   constructor(windowMs: number = DEFAULT_HISTORY_WINDOW_MS) {
@@ -64,9 +64,7 @@ export class RateHistory {
 
     // Also limit total entries to prevent memory issues
     const limited =
-      pruned.length > MAX_ENTRIES_PER_PROTOCOL
-        ? pruned.slice(-MAX_ENTRIES_PER_PROTOCOL)
-        : pruned;
+      pruned.length > MAX_ENTRIES_PER_PROTOCOL ? pruned.slice(-MAX_ENTRIES_PER_PROTOCOL) : pruned;
 
     this.history.set(entry.protocolId, limited);
   }
@@ -74,10 +72,7 @@ export class RateHistory {
   /**
    * Get all entries for a protocol within a time window.
    */
-  getEntries(
-    protocolId: YieldProtocol["id"],
-    windowMs?: number
-  ): RateEntry[] {
+  getEntries(protocolId: YieldProtocol['id'], windowMs?: number): RateEntry[] {
     const entries = this.history.get(protocolId) ?? [];
     const cutoff = Date.now() - (windowMs ?? this.windowMs);
     return entries.filter((e) => e.timestamp >= cutoff);
@@ -90,10 +85,7 @@ export class RateHistory {
    * @param windowHours - Number of hours to include in TWAP (default: 1)
    * @returns TWAP result with metadata, or null if insufficient data
    */
-  getTWAP(
-    protocolId: YieldProtocol["id"],
-    windowHours: number = 1
-  ): TWAPResult | null {
+  getTWAP(protocolId: YieldProtocol['id'], windowHours: number = 1): TWAPResult | null {
     const windowMs = windowHours * 60 * 60 * 1000;
     const entries = this.getEntries(protocolId, windowMs);
 
@@ -153,18 +145,15 @@ export class RateHistory {
    * 2. Deviation from TWAP - current rate far from average
    * 3. Insufficient data - not enough history to trust
    */
-  detectAnomalies(
-    protocolId: YieldProtocol["id"],
-    currentRate?: number
-  ): RateAnomaly {
+  detectAnomalies(protocolId: YieldProtocol['id'], currentRate?: number): RateAnomaly {
     const entries = this.getEntries(protocolId, RATE_VELOCITY_WINDOW_MS);
 
     // Insufficient data to detect anomalies
     if (entries.length < 2) {
       return {
         suspicious: false,
-        reason: "insufficient_data",
-        severity: "low",
+        reason: 'insufficient_data',
+        severity: 'low',
       };
     }
 
@@ -179,8 +168,8 @@ export class RateHistory {
       if (changePercent > RATE_VELOCITY_THRESHOLD) {
         return {
           suspicious: true,
-          reason: "high_rate_velocity",
-          severity: changePercent > 1.0 ? "high" : "medium",
+          reason: 'high_rate_velocity',
+          severity: changePercent > 1.0 ? 'high' : 'medium',
           details: {
             currentRate: latest,
             previousRate: oldest,
@@ -200,8 +189,8 @@ export class RateHistory {
       if (deviation > 0.2) {
         return {
           suspicious: true,
-          reason: "twap_deviation",
-          severity: deviation > 0.5 ? "high" : "medium",
+          reason: 'twap_deviation',
+          severity: deviation > 0.5 ? 'high' : 'medium',
           details: {
             currentRate: latest,
             previousRate: twapResult.twap,
@@ -218,7 +207,7 @@ export class RateHistory {
   /**
    * Get the latest rate for a protocol.
    */
-  getLatestRate(protocolId: YieldProtocol["id"]): RateEntry | null {
+  getLatestRate(protocolId: YieldProtocol['id']): RateEntry | null {
     const entries = this.history.get(protocolId);
     if (!entries || entries.length === 0) {
       return null;
@@ -229,7 +218,7 @@ export class RateHistory {
   /**
    * Check if rate data is stale.
    */
-  isStale(protocolId: YieldProtocol["id"], maxAgeMs: number): boolean {
+  isStale(protocolId: YieldProtocol['id'], maxAgeMs: number): boolean {
     const latest = this.getLatestRate(protocolId);
     if (!latest) {
       return true;
@@ -247,7 +236,7 @@ export class RateHistory {
   /**
    * Get statistics about the history.
    */
-  getStats(): Record<YieldProtocol["id"], { count: number; oldestMs: number }> {
+  getStats(): Record<YieldProtocol['id'], { count: number; oldestMs: number }> {
     const stats: Record<string, { count: number; oldestMs: number }> = {};
 
     for (const [protocolId, entries] of this.history) {
@@ -260,7 +249,7 @@ export class RateHistory {
       }
     }
 
-    return stats as Record<YieldProtocol["id"], { count: number; oldestMs: number }>;
+    return stats as Record<YieldProtocol['id'], { count: number; oldestMs: number }>;
   }
 }
 

@@ -115,17 +115,17 @@ contract AgentVaultTest is Test {
         protocols[0] = address(aave);
         protocols[1] = address(compound);
 
-        vault = AgentVault(payable(
-            factory.createVault(
-                OWNER_X,
-                OWNER_Y,
-                protocols,
-                10000e6, // $10,000 daily limit
-                0,       // Auto-execute threshold: 0 (all require approval)
-                1000e6,  // Session key daily cap: $1,000
-                bytes32(0)
-            )
-        ));
+        vault = AgentVault(
+            payable(factory.createVault(
+                    OWNER_X,
+                    OWNER_Y,
+                    protocols,
+                    10000e6, // $10,000 daily limit
+                    0, // Auto-execute threshold: 0 (all require approval)
+                    1000e6, // Session key daily cap: $1,000
+                    bytes32(0)
+                ))
+        );
 
         // Setup session key
         sessionKey = vm.addr(SESSION_KEY_PRIVATE);
@@ -187,13 +187,8 @@ contract AgentVaultTest is Test {
         usdc.approve(address(aave), type(uint256).max);
 
         // Execute strategy within limit
-        bytes memory supplyCall = abi.encodeWithSignature(
-            "supply(address,uint256,address,uint16)",
-            address(usdc),
-            1000e6,
-            address(vault),
-            0
-        );
+        bytes memory supplyCall =
+            abi.encodeWithSignature("supply(address,uint256,address,uint16)", address(usdc), 1000e6, address(vault), 0);
 
         vm.prank(ENTRY_POINT);
         vault.executeStrategy(address(aave), supplyCall);
@@ -227,13 +222,8 @@ contract AgentVaultTest is Test {
         usdc.approve(address(aave), type(uint256).max);
 
         // Use some of the limit
-        bytes memory supplyCall = abi.encodeWithSignature(
-            "supply(address,uint256,address,uint16)",
-            address(usdc),
-            5000e6,
-            address(vault),
-            0
-        );
+        bytes memory supplyCall =
+            abi.encodeWithSignature("supply(address,uint256,address,uint16)", address(usdc), 5000e6, address(vault), 0);
 
         vm.prank(ENTRY_POINT);
         vault.executeStrategy(address(aave), supplyCall);
@@ -417,15 +407,7 @@ contract AgentVaultFactoryTest is Test {
     function test_createVault() public {
         address[] memory protocols = new address[](0);
 
-        address vault = factory.createVault(
-            OWNER_X,
-            OWNER_Y,
-            protocols,
-            1000e6,
-            0,
-            500e6,
-            bytes32(0)
-        );
+        address vault = factory.createVault(OWNER_X, OWNER_Y, protocols, 1000e6, 0, 500e6, bytes32(0));
 
         assertTrue(vault != address(0));
         assertEq(AgentVault(payable(vault)).ownerX(), OWNER_X);
@@ -436,15 +418,7 @@ contract AgentVaultFactoryTest is Test {
         address[] memory protocols = new address[](0);
 
         address predicted = factory.getVaultAddress(OWNER_X, OWNER_Y, bytes32(0));
-        address actual = factory.createVault(
-            OWNER_X,
-            OWNER_Y,
-            protocols,
-            1000e6,
-            0,
-            500e6,
-            bytes32(0)
-        );
+        address actual = factory.createVault(OWNER_X, OWNER_Y, protocols, 1000e6, 0, 500e6, bytes32(0));
 
         assertEq(predicted, actual);
     }
@@ -452,25 +426,9 @@ contract AgentVaultFactoryTest is Test {
     function test_sameParamsReturnsSameVault() public {
         address[] memory protocols = new address[](0);
 
-        address vault1 = factory.createVault(
-            OWNER_X,
-            OWNER_Y,
-            protocols,
-            1000e6,
-            0,
-            500e6,
-            bytes32(0)
-        );
+        address vault1 = factory.createVault(OWNER_X, OWNER_Y, protocols, 1000e6, 0, 500e6, bytes32(0));
 
-        address vault2 = factory.createVault(
-            OWNER_X,
-            OWNER_Y,
-            protocols,
-            1000e6,
-            0,
-            500e6,
-            bytes32(0)
-        );
+        address vault2 = factory.createVault(OWNER_X, OWNER_Y, protocols, 1000e6, 0, 500e6, bytes32(0));
 
         assertEq(vault1, vault2);
     }
@@ -478,25 +436,9 @@ contract AgentVaultFactoryTest is Test {
     function test_differentSaltCreatesDifferentVault() public {
         address[] memory protocols = new address[](0);
 
-        address vault1 = factory.createVault(
-            OWNER_X,
-            OWNER_Y,
-            protocols,
-            1000e6,
-            0,
-            500e6,
-            bytes32(uint256(1))
-        );
+        address vault1 = factory.createVault(OWNER_X, OWNER_Y, protocols, 1000e6, 0, 500e6, bytes32(uint256(1)));
 
-        address vault2 = factory.createVault(
-            OWNER_X,
-            OWNER_Y,
-            protocols,
-            1000e6,
-            0,
-            500e6,
-            bytes32(uint256(2))
-        );
+        address vault2 = factory.createVault(OWNER_X, OWNER_Y, protocols, 1000e6, 0, 500e6, bytes32(uint256(2)));
 
         assertTrue(vault1 != vault2);
     }

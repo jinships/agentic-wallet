@@ -251,10 +251,7 @@ export class WalletManager {
   /**
    * Build a UserOperation for revoking a session key
    */
-  async buildRevokeSessionKeyOp(
-    vault: Address,
-    key: Address
-  ): Promise<PackedUserOperation> {
+  async buildRevokeSessionKeyOp(vault: Address, key: Address): Promise<PackedUserOperation> {
     const callData = encodeFunctionData({
       abi: AGENT_VAULT_ABI,
       functionName: 'revokeSessionKey',
@@ -267,10 +264,7 @@ export class WalletManager {
   /**
    * Build a base UserOperation with gas estimation
    */
-  private async buildUserOp(
-    sender: Address,
-    callData: Hex
-  ): Promise<PackedUserOperation> {
+  private async buildUserOp(sender: Address, callData: Hex): Promise<PackedUserOperation> {
     // Get nonce from EntryPoint
     const nonce = await this.getNonce(sender);
 
@@ -278,14 +272,8 @@ export class WalletManager {
     const gasParams = await this.estimateGas(sender, callData, nonce);
 
     // Pack gas parameters into v0.7 format
-    const accountGasLimits = packGasLimits(
-      gasParams.verificationGasLimit,
-      gasParams.callGasLimit
-    );
-    const gasFees = packGasFees(
-      gasParams.maxPriorityFeePerGas,
-      gasParams.maxFeePerGas
-    );
+    const accountGasLimits = packGasLimits(gasParams.verificationGasLimit, gasParams.callGasLimit);
+    const gasFees = packGasFees(gasParams.maxPriorityFeePerGas, gasParams.maxFeePerGas);
 
     return {
       sender,
@@ -362,7 +350,7 @@ export class WalletManager {
         }),
       });
 
-      const result = await response.json() as {
+      const result = (await response.json()) as {
         error?: unknown;
         result?: {
           verificationGasLimit: string;
@@ -556,10 +544,7 @@ export class WalletManager {
     );
 
     // Format: [sigType(1)] [encodedAuth]
-    const packedSignature = concat([
-      toHex(SIG_TYPE_PASSKEY, { size: 1 }),
-      encodedAuth,
-    ]) as Hex;
+    const packedSignature = concat([toHex(SIG_TYPE_PASSKEY, { size: 1 }), encodedAuth]) as Hex;
 
     return {
       ...userOp,
@@ -586,7 +571,7 @@ export class WalletManager {
       }),
     });
 
-    const result = await response.json() as {
+    const result = (await response.json()) as {
       error?: { message?: string };
       result?: Hex;
     };
@@ -625,7 +610,7 @@ export class WalletManager {
           }),
         });
 
-        const result = await response.json() as {
+        const result = (await response.json()) as {
           result?: {
             receipt: { transactionHash: Hex };
             success: boolean;
@@ -672,10 +657,7 @@ export class WalletManager {
  * Pack verification and call gas limits into bytes32
  * Format: bytes16(verificationGasLimit) + bytes16(callGasLimit)
  */
-function packGasLimits(
-  verificationGasLimit: bigint,
-  callGasLimit: bigint
-): Hex {
+function packGasLimits(verificationGasLimit: bigint, callGasLimit: bigint): Hex {
   return concat([
     pad(toHex(verificationGasLimit), { size: 16 }),
     pad(toHex(callGasLimit), { size: 16 }),
@@ -686,10 +668,7 @@ function packGasLimits(
  * Pack max priority and max fee per gas into bytes32
  * Format: bytes16(maxPriorityFeePerGas) + bytes16(maxFeePerGas)
  */
-function packGasFees(
-  maxPriorityFeePerGas: bigint,
-  maxFeePerGas: bigint
-): Hex {
+function packGasFees(maxPriorityFeePerGas: bigint, maxFeePerGas: bigint): Hex {
   return concat([
     pad(toHex(maxPriorityFeePerGas), { size: 16 }),
     pad(toHex(maxFeePerGas), { size: 16 }),
@@ -866,10 +845,7 @@ export const ProtocolEncoders = {
 /**
  * Create a WalletManager instance for Base mainnet
  */
-export function createWalletManager(
-  publicClient: PublicClient,
-  bundlerUrl: string
-): WalletManager {
+export function createWalletManager(publicClient: PublicClient, bundlerUrl: string): WalletManager {
   return new WalletManager({
     publicClient,
     bundlerUrl,

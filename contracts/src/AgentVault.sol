@@ -94,8 +94,7 @@ contract AgentVault is ERC4337, ReentrancyGuard {
     uint8 private constant SIG_TYPE_SESSION_KEY = 1;
 
     /// @notice secp256k1 curve order / 2 for signature malleability check
-    uint256 private constant SECP256K1_N_DIV_2 =
-        0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0;
+    uint256 private constant SECP256K1_N_DIV_2 = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0;
 
     /// @notice Transient storage slot for current session key (used to track spending)
     /// @dev Using EIP-1153 transient storage to pass session key from validation to execution
@@ -205,11 +204,7 @@ contract AgentVault is ERC4337, ReentrancyGuard {
     }
 
     /// @dev Validate a passkey (WebAuthn P-256) signature
-    function _validatePasskeySignature(bytes calldata signature, bytes32 userOpHash)
-        internal
-        view
-        returns (uint256)
-    {
+    function _validatePasskeySignature(bytes calldata signature, bytes32 userOpHash) internal view returns (uint256) {
         WebAuthn.WebAuthnAuth memory auth = abi.decode(signature, (WebAuthn.WebAuthnAuth));
 
         bool valid = WebAuthn.verify(
@@ -251,9 +246,7 @@ contract AgentVault is ERC4337, ReentrancyGuard {
         if (sk.spent + uint128(amount) > sk.spendLimit) return 1;
 
         // Verify ECDSA signature
-        bytes32 ethSignedHash = keccak256(
-            abi.encodePacked("\x19Ethereum Signed Message:\n32", userOpHash)
-        );
+        bytes32 ethSignedHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", userOpHash));
 
         (bytes32 r, bytes32 s, uint8 v) = _splitSignature(sig);
 
@@ -317,11 +310,7 @@ contract AgentVault is ERC4337, ReentrancyGuard {
     /// @param validUntil Unix timestamp when the key expires
     /// @param spendLimit Maximum cumulative spend for this key
     function grantSessionKey(address key, uint48 validUntil, uint128 spendLimit) external onlyEntryPoint {
-        sessionKeys[key] = SessionKey({
-            validUntil: validUntil,
-            spendLimit: spendLimit,
-            spent: 0
-        });
+        sessionKeys[key] = SessionKey({validUntil: validUntil, spendLimit: spendLimit, spent: 0});
         emit SessionKeyGranted(key, validUntil, spendLimit);
     }
 
@@ -584,32 +573,17 @@ contract AgentVault is ERC4337, ReentrancyGuard {
 
     /// @dev Disable inherited execute() to enforce security controls (CRITICAL-2 fix)
     /// @notice All operations must go through executeStrategy (with whitelist) or withdraw
-    function execute(address, uint256, bytes calldata)
-        public
-        payable
-        override
-        returns (bytes memory)
-    {
+    function execute(address, uint256, bytes calldata) public payable override returns (bytes memory) {
         revert DirectExecuteDisabled();
     }
 
     /// @dev Disable inherited executeBatch() to enforce security controls (CRITICAL-2 fix)
-    function executeBatch(Call[] calldata)
-        public
-        payable
-        override
-        returns (bytes[] memory)
-    {
+    function executeBatch(Call[] calldata) public payable override returns (bytes[] memory) {
         revert DirectExecuteDisabled();
     }
 
     /// @dev EIP-712 domain name and version for signature verification
-    function _domainNameAndVersion()
-        internal
-        pure
-        override
-        returns (string memory name, string memory version)
-    {
+    function _domainNameAndVersion() internal pure override returns (string memory name, string memory version) {
         name = "AgentVault";
         version = "1";
     }

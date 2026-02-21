@@ -9,9 +9,9 @@
  * - Secure key lifecycle management
  */
 
-import { type Address, type Hex, keccak256, toHex, hexToBytes, bytesToHex } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
-import * as crypto from "node:crypto";
+import { type Address, type Hex, keccak256, toHex, hexToBytes, bytesToHex } from 'viem';
+import { privateKeyToAccount } from 'viem/accounts';
+import * as crypto from 'node:crypto';
 
 /**
  * Encrypted session key - safe to store/log
@@ -39,7 +39,7 @@ export interface DecryptedSessionKey {
   };
 }
 
-const ALGORITHM = "aes-256-gcm";
+const ALGORITHM = 'aes-256-gcm';
 const KEY_LENGTH = 32; // 256 bits
 const IV_LENGTH = 12; // 96 bits for GCM
 
@@ -61,7 +61,7 @@ export class SecureSessionKeyManager {
    * @param masterKey - 32-byte hex string or Buffer. In production, load from KMS/HSM.
    */
   constructor(masterKey: Hex | Buffer) {
-    if (typeof masterKey === "string") {
+    if (typeof masterKey === 'string') {
       const keyBytes = hexToBytes(masterKey as Hex);
       if (keyBytes.length !== KEY_LENGTH) {
         throw new Error(`Master key must be ${KEY_LENGTH} bytes (got ${keyBytes.length})`);
@@ -207,9 +207,7 @@ export class SecureSessionKeyManager {
    */
   getValidSessionKeys(): EncryptedSessionKey[] {
     const now = Date.now() / 1000;
-    return Array.from(this.encryptedKeys.values()).filter(
-      (k) => k.config.validUntil > now
-    );
+    return Array.from(this.encryptedKeys.values()).filter((k) => k.config.validUntil > now);
   }
 
   /**
@@ -243,28 +241,21 @@ export class SecureSessionKeyManager {
     const authTag = cipher.getAuthTag();
 
     return {
-      ciphertext: encrypted.toString("base64"),
-      iv: iv.toString("base64"),
-      authTag: authTag.toString("base64"),
+      ciphertext: encrypted.toString('base64'),
+      iv: iv.toString('base64'),
+      authTag: authTag.toString('base64'),
     };
   }
 
-  private decrypt(
-    ciphertext: string,
-    ivBase64: string,
-    authTagBase64: string
-  ): Buffer {
-    const encrypted = Buffer.from(ciphertext, "base64");
-    const iv = Buffer.from(ivBase64, "base64");
-    const authTag = Buffer.from(authTagBase64, "base64");
+  private decrypt(ciphertext: string, ivBase64: string, authTagBase64: string): Buffer {
+    const encrypted = Buffer.from(ciphertext, 'base64');
+    const iv = Buffer.from(ivBase64, 'base64');
+    const authTag = Buffer.from(authTagBase64, 'base64');
 
     const decipher = crypto.createDecipheriv(ALGORITHM, this.encryptionKey, iv);
     decipher.setAuthTag(authTag);
 
-    const decrypted = Buffer.concat([
-      decipher.update(encrypted),
-      decipher.final(),
-    ]);
+    const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
 
     return decrypted;
   }
@@ -274,11 +265,8 @@ export class SecureSessionKeyManager {
  * Create a master key from a password/secret using PBKDF2.
  * Use this if you don't have a KMS-provided key.
  */
-export function deriveMasterKey(
-  secret: string,
-  salt: string = "agentvault-session-keys"
-): Buffer {
-  return crypto.pbkdf2Sync(secret, salt, 100000, KEY_LENGTH, "sha256");
+export function deriveMasterKey(secret: string, salt: string = 'agentvault-session-keys'): Buffer {
+  return crypto.pbkdf2Sync(secret, salt, 100000, KEY_LENGTH, 'sha256');
 }
 
 /**

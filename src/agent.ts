@@ -78,7 +78,9 @@ function loadConfigFromEnv(): AgentConfig {
     sessionKeyPrivate: required('SESSION_KEY_PRIVATE') as Hex,
     approvalUiBaseUrl: optional('APPROVAL_UI_URL', 'http://localhost:3000'),
     pollIntervalMs: Number(optional('POLL_INTERVAL_MS', String(YIELD_CONFIG.POLL_INTERVAL_MS))),
-    autoExecuteThreshold: BigInt(optional('AUTO_EXECUTE_THRESHOLD', String(YIELD_CONFIG.AUTO_EXECUTE_THRESHOLD))),
+    autoExecuteThreshold: BigInt(
+      optional('AUTO_EXECUTE_THRESHOLD', String(YIELD_CONFIG.AUTO_EXECUTE_THRESHOLD))
+    ),
   };
 }
 
@@ -261,7 +263,6 @@ export class AgentRunner {
       } else {
         await this.requestApproval(proposal);
       }
-
     } catch (error) {
       this.logger.error('Failed to check/rebalance', { error: String(error) });
     }
@@ -336,7 +337,6 @@ export class AgentRunner {
           { error: 'Execution reverted', revertReason: undefined }
         );
       }
-
     } catch (error) {
       this.logger.error('Auto-execution failed', { proposalId: proposal.id, error: String(error) });
       throw error;
@@ -385,9 +385,11 @@ export class AgentRunner {
         console.log('\nApproval URL:', notification.approvalUrl);
         console.log('=========================================\n');
       }
-
     } catch (error) {
-      this.logger.error('Failed to create approval request', { proposalId: proposal.id, error: String(error) });
+      this.logger.error('Failed to create approval request', {
+        proposalId: proposal.id,
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -422,7 +424,6 @@ export class AgentRunner {
       }
 
       return { txHash: result.txHash };
-
     } catch (error) {
       this.logger.error('Failed to process approval', { proposalId, error: String(error) });
       throw error;
@@ -480,18 +481,20 @@ export class AgentRunner {
 
     // Check raw USDC balance in vault
     try {
-      const balance = await this.client.readContract({
+      const balance = (await this.client.readContract({
         address: ADDRESSES.USDC as Address,
-        abi: [{
-          name: 'balanceOf',
-          type: 'function',
-          inputs: [{ name: 'account', type: 'address' }],
-          outputs: [{ type: 'uint256' }],
-          stateMutability: 'view',
-        }],
+        abi: [
+          {
+            name: 'balanceOf',
+            type: 'function',
+            inputs: [{ name: 'account', type: 'address' }],
+            outputs: [{ type: 'uint256' }],
+            stateMutability: 'view',
+          },
+        ],
         functionName: 'balanceOf',
         args: [this.config.vaultAddress],
-      }) as bigint;
+      })) as bigint;
 
       return balance;
     } catch {
@@ -512,16 +515,10 @@ export class AgentRunner {
         );
         break;
       case Protocol.COMPOUND_V3:
-        protocolData = ProtocolEncoders.compoundSupply(
-          ADDRESSES.USDC as Address,
-          proposal.amount
-        );
+        protocolData = ProtocolEncoders.compoundSupply(ADDRESSES.USDC as Address, proposal.amount);
         break;
       case Protocol.MORPHO_BLUE:
-        protocolData = ProtocolEncoders.erc4626Deposit(
-          proposal.amount,
-          this.config.vaultAddress
-        );
+        protocolData = ProtocolEncoders.erc4626Deposit(proposal.amount, this.config.vaultAddress);
         break;
       case Protocol.MOONWELL:
         protocolData = ProtocolEncoders.moonwellMint(proposal.amount);
@@ -570,31 +567,37 @@ export class AgentRunner {
 function createAgentLogger(): SimpleLogger {
   return {
     info: (message: string, data?: Record<string, unknown>) => {
-      console.log(JSON.stringify({
-        level: 'info',
-        timestamp: new Date().toISOString(),
-        component: 'agent',
-        message,
-        ...data,
-      }));
+      console.log(
+        JSON.stringify({
+          level: 'info',
+          timestamp: new Date().toISOString(),
+          component: 'agent',
+          message,
+          ...data,
+        })
+      );
     },
     warn: (message: string, data?: Record<string, unknown>) => {
-      console.log(JSON.stringify({
-        level: 'warn',
-        timestamp: new Date().toISOString(),
-        component: 'agent',
-        message,
-        ...data,
-      }));
+      console.log(
+        JSON.stringify({
+          level: 'warn',
+          timestamp: new Date().toISOString(),
+          component: 'agent',
+          message,
+          ...data,
+        })
+      );
     },
     error: (message: string, data?: Record<string, unknown>) => {
-      console.error(JSON.stringify({
-        level: 'error',
-        timestamp: new Date().toISOString(),
-        component: 'agent',
-        message,
-        ...data,
-      }));
+      console.error(
+        JSON.stringify({
+          level: 'error',
+          timestamp: new Date().toISOString(),
+          component: 'agent',
+          message,
+          ...data,
+        })
+      );
     },
   };
 }

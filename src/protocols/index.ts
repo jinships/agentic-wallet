@@ -1,4 +1,4 @@
-import type { Address, Hex, Abi, ContractFunctionName, ContractFunctionArgs } from "viem";
+import type { Address, Hex, Abi, ContractFunctionName, ContractFunctionArgs } from 'viem';
 
 /**
  * Minimal client interface for protocol interactions.
@@ -7,8 +7,8 @@ import type { Address, Hex, Abi, ContractFunctionName, ContractFunctionArgs } fr
 export interface ReadContractClient {
   readContract<
     const TAbi extends Abi | readonly unknown[],
-    TFunctionName extends ContractFunctionName<TAbi, "view" | "pure">,
-    TArgs extends ContractFunctionArgs<TAbi, "view" | "pure", TFunctionName>
+    TFunctionName extends ContractFunctionName<TAbi, 'view' | 'pure'>,
+    TArgs extends ContractFunctionArgs<TAbi, 'view' | 'pure', TFunctionName>,
   >(args: {
     address: Address;
     abi: TAbi;
@@ -30,7 +30,7 @@ export interface YieldProtocol {
   readonly address: Address;
 
   /** Protocol identifier for logging and tracking */
-  readonly id: "aave" | "compound" | "morpho" | "moonwell";
+  readonly id: 'aave' | 'compound' | 'morpho' | 'moonwell';
 
   /**
    * Get the current supply APY for USDC.
@@ -66,7 +66,7 @@ export interface YieldProtocol {
  * Snapshot of a protocol's current state.
  */
 export interface ProtocolSnapshot {
-  protocolId: YieldProtocol["id"];
+  protocolId: YieldProtocol['id'];
   protocolName: string;
   address: Address;
   apyPercent: number;
@@ -87,7 +87,7 @@ export interface YieldComparison {
 }
 
 // Re-export protocol implementations
-export { AaveProtocol } from "./aave.js";
-export { CompoundProtocol } from "./compound.js";
-export { MorphoProtocol } from "./morpho.js";
-export { MoonwellProtocol } from "./moonwell.js";
+export { AaveProtocol } from './aave.js';
+export { CompoundProtocol } from './compound.js';
+export { MorphoProtocol } from './morpho.js';
+export { MoonwellProtocol } from './moonwell.js';

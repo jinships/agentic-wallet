@@ -78,9 +78,9 @@ contract CreateVaultScript is Script {
             ownerX,
             ownerY,
             protocols,
-            10000e6,  // $10,000 daily limit
-            0,        // Auto-execute threshold: 0 (all require approval)
-            1000e6,   // Session key daily cap: $1,000
+            10000e6, // $10,000 daily limit
+            0, // Auto-execute threshold: 0 (all require approval)
+            1000e6, // Session key daily cap: $1,000
             bytes32(0)
         );
 

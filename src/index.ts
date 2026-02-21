@@ -43,9 +43,7 @@ export {
 } from './audit-logger.js';
 
 // ============ Session Key Manager ============
-export {
-  SecureSessionKeyManager,
-} from './session-key-manager.js';
+export { SecureSessionKeyManager } from './session-key-manager.js';
 
 // ============ Yield Monitor ============
 export {

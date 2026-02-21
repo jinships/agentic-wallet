@@ -3,17 +3,17 @@
  * Used when on-chain rate reads fail or are stale.
  */
 
-import type { YieldProtocol } from "./index.js";
+import type { YieldProtocol } from './index.js';
 
-const DEFILLAMA_YIELDS_URL = "https://yields.llama.fi/pools";
+const DEFILLAMA_YIELDS_URL = 'https://yields.llama.fi/pools';
 
 // DeFiLlama pool IDs for our protocols on Base
 // These are stable identifiers from DeFiLlama's API
-const POOL_MAPPINGS: Record<YieldProtocol["id"], string> = {
-  aave: "825688c0-c694-4a6b-8497-177e425b7348", // Aave V3 USDC on Base
-  compound: "7da72d09-56ca-4ec5-a45f-59114353e487", // Compound V3 USDC on Base
-  morpho: "c246220b-541a-4902-8a35-f5c5ad263a8e", // Morpho Blue USDC on Base
-  moonwell: "e5ae4a88-32b1-44e3-9a5a-7be29188e7a4", // Moonwell USDC on Base
+const POOL_MAPPINGS: Record<YieldProtocol['id'], string> = {
+  aave: '825688c0-c694-4a6b-8497-177e425b7348', // Aave V3 USDC on Base
+  compound: '7da72d09-56ca-4ec5-a45f-59114353e487', // Compound V3 USDC on Base
+  morpho: 'c246220b-541a-4902-8a35-f5c5ad263a8e', // Morpho Blue USDC on Base
+  moonwell: 'e5ae4a88-32b1-44e3-9a5a-7be29188e7a4', // Moonwell USDC on Base
 };
 
 interface DeFiLlamaPool {
@@ -33,9 +33,9 @@ interface DeFiLlamaResponse {
 }
 
 export interface DeFiLlamaRates {
-  rates: Map<YieldProtocol["id"], number>;
+  rates: Map<YieldProtocol['id'], number>;
   timestamp: number;
-  source: "defillama";
+  source: 'defillama';
 }
 
 /**
@@ -43,18 +43,18 @@ export interface DeFiLlamaRates {
  */
 export async function fetchDeFiLlamaRates(): Promise<DeFiLlamaRates> {
   const response = await fetchWithRetry(DEFILLAMA_YIELDS_URL, 3);
-  const data = await response.json() as DeFiLlamaResponse;
+  const data = (await response.json()) as DeFiLlamaResponse;
 
-  if (data.status !== "success") {
+  if (data.status !== 'success') {
     throw new Error(`DeFiLlama API error: ${data.status}`);
   }
 
-  const rates = new Map<YieldProtocol["id"], number>();
+  const rates = new Map<YieldProtocol['id'], number>();
 
   // Build a lookup map from pool ID to our protocol ID
-  const poolToProtocol = new Map<string, YieldProtocol["id"]>();
+  const poolToProtocol = new Map<string, YieldProtocol['id']>();
   for (const [protocolId, poolId] of Object.entries(POOL_MAPPINGS)) {
-    poolToProtocol.set(poolId, protocolId as YieldProtocol["id"]);
+    poolToProtocol.set(poolId, protocolId as YieldProtocol['id']);
   }
 
   // Extract rates for our protocols
@@ -71,7 +71,7 @@ export async function fetchDeFiLlamaRates(): Promise<DeFiLlamaRates> {
   return {
     rates,
     timestamp: Date.now(),
-    source: "defillama",
+    source: 'defillama',
   };
 }
 
@@ -89,8 +89,8 @@ async function fetchWithRetry(
     try {
       const response = await fetch(url, {
         headers: {
-          Accept: "application/json",
-          "User-Agent": "AgentVault/1.0",
+          Accept: 'application/json',
+          'User-Agent': 'AgentVault/1.0',
         },
       });
 
@@ -109,14 +109,12 @@ async function fetchWithRetry(
     }
   }
 
-  throw new Error(
-    `Failed after ${maxRetries} retries: ${lastError?.message}`
-  );
+  throw new Error(`Failed after ${maxRetries} retries: ${lastError?.message}`);
 }
 
 /**
  * Get the DeFiLlama pool ID for a protocol.
  */
-export function getPoolId(protocolId: YieldProtocol["id"]): string | undefined {
+export function getPoolId(protocolId: YieldProtocol['id']): string | undefined {
   return POOL_MAPPINGS[protocolId];
 }
