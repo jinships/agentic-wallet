@@ -21,14 +21,14 @@
       },
       "style": {
         "noNonNullAssertion": "off",
-        "useImportType": "warn",
-        "useNodejsImportProtocol": "warn",
-        "useExponentiationOperator": "warn",
-        "useTemplate": "warn",
-        "noUnusedTemplateLiteral": "warn",
-        "useNumberNamespace": "warn",
-        "noParameterAssign": "warn",
-        "useDefaultParameterLast": "warn"
+        "useImportType": "off",
+        "useNodejsImportProtocol": "off",
+        "useExponentiationOperator": "off",
+        "useTemplate": "off",
+        "noUnusedTemplateLiteral": "off",
+        "useNumberNamespace": "off",
+        "noParameterAssign": "off",
+        "useDefaultParameterLast": "off"
       }
     }
   },
