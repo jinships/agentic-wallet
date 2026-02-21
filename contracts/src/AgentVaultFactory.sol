@@ -13,12 +13,7 @@ contract AgentVaultFactory {
                                  EVENTS
     //////////////////////////////////////////////////////////////*/
 
-    event VaultCreated(
-        address indexed vault,
-        uint256 indexed ownerX,
-        uint256 indexed ownerY,
-        bytes32 salt
-    );
+    event VaultCreated(address indexed vault, uint256 indexed ownerX, uint256 indexed ownerY, bytes32 salt);
 
     /*//////////////////////////////////////////////////////////////
                                IMMUTABLES
@@ -68,14 +63,8 @@ contract AgentVaultFactory {
 
         if (!alreadyDeployed) {
             // Initialize the vault with passkey and configuration
-            AgentVault(payable(account)).initialize(
-                ownerX,
-                ownerY,
-                protocols,
-                dailyLimit,
-                autoExecuteThreshold,
-                sessionKeyDailyCap
-            );
+            AgentVault(payable(account))
+                .initialize(ownerX, ownerY, protocols, dailyLimit, autoExecuteThreshold, sessionKeyDailyCap);
 
             emit VaultCreated(account, ownerX, ownerY, salt);
         }
@@ -89,17 +78,9 @@ contract AgentVaultFactory {
     /// @param ownerY P-256 public key Y coordinate
     /// @param salt Additional salt for address derivation
     /// @return The deterministic vault address
-    function getVaultAddress(
-        uint256 ownerX,
-        uint256 ownerY,
-        bytes32 salt
-    ) external view returns (address) {
+    function getVaultAddress(uint256 ownerX, uint256 ownerY, bytes32 salt) external view returns (address) {
         bytes32 combinedSalt = keccak256(abi.encodePacked(ownerX, ownerY, salt));
-        return LibClone.predictDeterministicAddressERC1967(
-            implementation,
-            combinedSalt,
-            address(this)
-        );
+        return LibClone.predictDeterministicAddressERC1967(implementation, combinedSalt, address(this));
     }
 
     /// @notice Get the initialization code hash for the vault proxy
