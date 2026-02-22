@@ -47,7 +47,7 @@ describe.skipIf(!TESTNET_ENABLED)('DeFiLlama API (live)', () => {
 
       // The spread between protocols shouldn't be more than 20% absolute
       // (e.g., if one is at 5%, another shouldn't be at 25%)
-      expect(max - min).toBeLessThan(0.20);
+      expect(max - min).toBeLessThan(0.2);
     },
     TIMEOUT
   );
@@ -59,9 +59,7 @@ describe.skipIf(!TESTNET_ENABLED)('DeFiLlama API (live)', () => {
         const poolId = getPoolId(id);
         expect(poolId).toBeTruthy();
         // DeFiLlama pool IDs are UUIDs
-        expect(poolId).toMatch(
-          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-        );
+        expect(poolId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
       }
     });
   });

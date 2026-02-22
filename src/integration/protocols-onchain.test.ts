@@ -13,12 +13,7 @@ import { AaveProtocol } from '../protocols/aave.js';
 import { CompoundProtocol } from '../protocols/compound.js';
 import { MorphoProtocol } from '../protocols/morpho.js';
 import { MoonwellProtocol } from '../protocols/moonwell.js';
-import {
-  TESTNET_ENABLED,
-  getBaseMainnetClient,
-  KNOWN_BASE_ADDRESS,
-  retry,
-} from './setup.js';
+import { TESTNET_ENABLED, getBaseMainnetClient, KNOWN_BASE_ADDRESS, retry } from './setup.js';
 import type { Address } from 'viem';
 
 const TIMEOUT = 30_000;

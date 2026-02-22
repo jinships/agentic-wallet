@@ -35,9 +35,7 @@ describe.skipIf(!TESTNET_ENABLED)('YieldMonitor E2E (Base mainnet)', () => {
         rateStalenesMs: 7200000,
       });
 
-      const { snapshots, dataSource } = await retry(() =>
-        monitor.getSnapshots(EMPTY_VAULT)
-      );
+      const { snapshots, dataSource } = await retry(() => monitor.getSnapshots(EMPTY_VAULT));
 
       expect(snapshots).toHaveLength(4);
       expect(['onchain', 'defillama', 'mixed']).toContain(dataSource);
@@ -65,9 +63,7 @@ describe.skipIf(!TESTNET_ENABLED)('YieldMonitor E2E (Base mainnet)', () => {
         rateStalenesMs: 7200000,
       });
 
-      const comparison = await retry(() =>
-        monitor.compareYields(EMPTY_VAULT)
-      );
+      const comparison = await retry(() => monitor.compareYields(EMPTY_VAULT));
 
       // Best protocol should have the highest APY
       expect(comparison.bestProtocol).toBeDefined();
@@ -127,9 +123,7 @@ describe.skipIf(!TESTNET_ENABLED)('YieldMonitor E2E (Base mainnet)', () => {
       await retry(() => monitor.compareYields(EMPTY_VAULT));
 
       // Second call has history to compare against
-      const comparison = await retry(() =>
-        monitor.compareYields(EMPTY_VAULT)
-      );
+      const comparison = await retry(() => monitor.compareYields(EMPTY_VAULT));
 
       // With two quick successive calls, rates shouldn't change much
       // so no anomalies should be detected

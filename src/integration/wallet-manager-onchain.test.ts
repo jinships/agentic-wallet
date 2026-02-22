@@ -99,11 +99,7 @@ describe.skipIf(!TESTNET_ENABLED)('WalletManager on-chain (Base mainnet)', () =>
         const callData = ProtocolEncoders.compoundSupply(ADDRESSES.USDC as Address, 1_000_000n);
 
         const userOp = await retry(() =>
-          wm.buildExecuteStrategyOp(
-            DUMMY_VAULT,
-            ADDRESSES.COMPOUND_CUSDC as Address,
-            callData
-          )
+          wm.buildExecuteStrategyOp(DUMMY_VAULT, ADDRESSES.COMPOUND_CUSDC as Address, callData)
         );
 
         expect(userOp.sender).toBe(DUMMY_VAULT);

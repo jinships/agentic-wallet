@@ -48,11 +48,7 @@ export const KNOWN_BASE_ADDRESS = '0x0000000000000000000000000000000000000001' a
 /**
  * Retry wrapper for flaky network calls in tests.
  */
-export async function retry<T>(
-  fn: () => Promise<T>,
-  maxRetries = 5,
-  delayMs = 2000
-): Promise<T> {
+export async function retry<T>(fn: () => Promise<T>, maxRetries = 5, delayMs = 2000): Promise<T> {
   let lastError: Error | undefined;
   for (let i = 0; i < maxRetries; i++) {
     try {
