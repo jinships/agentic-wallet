@@ -103,7 +103,7 @@ describe.skipIf(!TESTNET_ENABLED)('YieldMonitor E2E (Base mainnet)', () => {
       expect(protocolIds.length).toBeGreaterThan(0);
 
       for (const id of protocolIds) {
-        expect(stats[id].count).toBeGreaterThanOrEqual(1);
+        expect(stats[id as keyof typeof stats].count).toBeGreaterThanOrEqual(1);
       }
     },
     TIMEOUT
