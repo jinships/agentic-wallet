@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import {
-  InMemoryAuditStorage,
-  AuditLogger,
-  createInMemoryAuditLogger,
-} from './audit-logger.js';
+import { InMemoryAuditStorage, AuditLogger, createInMemoryAuditLogger } from './audit-logger.js';
 import { AuditEventType, type AuditLogEntry } from './types.js';
 import type { Address, Hex } from 'viem';
 
@@ -57,15 +53,9 @@ describe('InMemoryAuditStorage', () => {
   });
 
   it('queries by event type', async () => {
-    await storage.store(
-      makeEntry({ id: 'a', eventType: AuditEventType.EXECUTION_SUCCESS })
-    );
-    await storage.store(
-      makeEntry({ id: 'b', eventType: AuditEventType.EXECUTION_FAILED })
-    );
-    await storage.store(
-      makeEntry({ id: 'c', eventType: AuditEventType.EXECUTION_SUCCESS })
-    );
+    await storage.store(makeEntry({ id: 'a', eventType: AuditEventType.EXECUTION_SUCCESS }));
+    await storage.store(makeEntry({ id: 'b', eventType: AuditEventType.EXECUTION_FAILED }));
+    await storage.store(makeEntry({ id: 'c', eventType: AuditEventType.EXECUTION_SUCCESS }));
 
     const results = await storage.queryByEventType(AuditEventType.EXECUTION_SUCCESS);
     expect(results).toHaveLength(2);
@@ -80,10 +70,7 @@ describe('InMemoryAuditStorage', () => {
     await storage.store(makeEntry({ id: 'b', timestamp: t2 }));
     await storage.store(makeEntry({ id: 'c', timestamp: t3 }));
 
-    const results = await storage.queryByTimeRange(
-      new Date('2025-03-01'),
-      new Date('2025-09-01')
-    );
+    const results = await storage.queryByTimeRange(new Date('2025-03-01'), new Date('2025-09-01'));
     expect(results).toHaveLength(1);
     expect(results[0].id).toBe('b');
   });

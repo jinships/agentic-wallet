@@ -104,9 +104,9 @@ describe('SecureSessionKeyManager', () => {
     });
 
     it('throws for unknown address', () => {
-      expect(() =>
-        manager.decryptForSigning('0x0000000000000000000000000000000000000001')
-      ).toThrow(/No session key found/);
+      expect(() => manager.decryptForSigning('0x0000000000000000000000000000000000000001')).toThrow(
+        /No session key found/
+      );
     });
 
     it('throws for expired keys', () => {

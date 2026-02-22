@@ -12,9 +12,7 @@ describe('ProtocolEncoders', () => {
       // supply selector = 0x617ba037
       expect(data.slice(0, 10)).toBe('0x617ba037');
       // Should contain the USDC address (without 0x prefix, lowercase, zero-padded)
-      expect(data.toLowerCase()).toContain(
-        ADDRESSES.USDC.slice(2).toLowerCase()
-      );
+      expect(data.toLowerCase()).toContain(ADDRESSES.USDC.slice(2).toLowerCase());
     });
   });
 

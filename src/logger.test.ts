@@ -34,7 +34,10 @@ describe('Logger', () => {
 
   it('includes component context in output', () => {
     const output = vi.fn();
-    const logger = new Logger({ component: 'yield-monitor' }, { level: 'info', output, pretty: false });
+    const logger = new Logger(
+      { component: 'yield-monitor' },
+      { level: 'info', output, pretty: false }
+    );
 
     logger.info('test message');
 
@@ -81,10 +84,19 @@ describe('Logger', () => {
       const comparison: YieldComparison = {
         snapshots: [
           makeSnapshot({ protocolId: 'aave', apyPercent: 0.05, balance: 1_000_000n }),
-          makeSnapshot({ protocolId: 'compound', protocolName: 'Compound V3', apyPercent: 0.04, balance: 0n }),
+          makeSnapshot({
+            protocolId: 'compound',
+            protocolName: 'Compound V3',
+            apyPercent: 0.04,
+            balance: 0n,
+          }),
         ],
         bestProtocol: makeSnapshot({ protocolId: 'aave', apyPercent: 0.05 }),
-        currentProtocol: makeSnapshot({ protocolId: 'aave', apyPercent: 0.05, balance: 1_000_000n }),
+        currentProtocol: makeSnapshot({
+          protocolId: 'aave',
+          apyPercent: 0.05,
+          balance: 1_000_000n,
+        }),
         apyDifferentialBps: 0,
         shouldRebalance: false,
         timestamp: Date.now(),
@@ -130,7 +142,11 @@ describe('Logger', () => {
       const output = vi.fn();
       const logger = new Logger({ component: 'test' }, { level: 'info', output, pretty: false });
 
-      logger.logAnomaly('aave', { suspicious: true, reason: 'high_rate_velocity', severity: 'high' }, 'blocked');
+      logger.logAnomaly(
+        'aave',
+        { suspicious: true, reason: 'high_rate_velocity', severity: 'high' },
+        'blocked'
+      );
 
       const parsed = JSON.parse(output.mock.calls[0][0]);
       expect(parsed.level).toBe('warn');

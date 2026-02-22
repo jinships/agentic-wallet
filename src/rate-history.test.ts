@@ -83,7 +83,7 @@ describe('RateHistory', () => {
       const now = Date.now();
       // 5% -> 10% (100% change) within the velocity window
       history.record({ protocolId: 'aave', apy: 0.05, timestamp: now - 30000, source: 'onchain' });
-      history.record({ protocolId: 'aave', apy: 0.10, timestamp: now, source: 'onchain' });
+      history.record({ protocolId: 'aave', apy: 0.1, timestamp: now, source: 'onchain' });
 
       const result = history.detectAnomalies('aave');
       expect(result.suspicious).toBe(true);
